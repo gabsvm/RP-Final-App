@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>IronLog</title>
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="IronLog">
+
+    <!-- 1. ESTILOS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+
+    <!-- 2. REACT -->
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    
+    <!-- 3. BABEL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+    <style>
+        body { 
+            background-color: #0f172a; color: white; font-family: system-ui, -apple-system, sans-serif; 
+            margin: 0; padding: 0; width: 100%; height: 100%; position: fixed; overflow: hidden;
+        }
+        #root { height: 100%; width: 100%; display: flex; flex-direction: column; }
+        
+        .scroll-container { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .scroll-container::-webkit-scrollbar { width: 4px; }
+        .scroll-container::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 4px; }
+        
+        .loader { border: 3px solid #334155; border-top: 3px solid #ef4444; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .animate-fade-in { animation: fadeIn 0.2s ease-out; }
+        .animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    </style>
+
+    <!-- PWA INJECTION SCRIPT -->
+    <script>
+        (function() {
+            // Generar Icono SVG Base64
+            const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#0f172a"/><path d="M166 160h180v40h-40v112h40v40H166v-40h40V200h-40v-40z" fill="#ef4444"/><rect x="116" y="160" width="30" height="192" rx="8" fill="#475569"/><rect x="366" y="160" width="30" height="192" rx="8" fill="#475569"/><path d="M256 120l-30-30h60z" fill="#ef4444"/></svg>`;
+            const iconUrl = 'data:image/svg+xml;base64,' + btoa(iconSvg);
+
+            // Inyectar Favicons
+            const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.href = iconUrl; document.head.appendChild(linkIcon);
+            const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = iconUrl; document.head.appendChild(linkApple);
+
+            // Generar Manifest Dinámico
+            const manifest = {
+                name: "IronLog",
+                short_name: "IronLog",
+                start_url: ".",
+                display: "standalone",
+                background_color: "#0f172a",
+                theme_color: "#0f172a",
+                icons: [{ src: iconUrl, sizes: "512x512", type: "image/svg+xml" }]
+            };
+            const manifestUrl = 'data:application/manifest+json;base64,' + btoa(JSON.stringify(manifest));
+            const linkManifest = document.createElement('link'); linkManifest.rel = 'manifest'; linkManifest.href = manifestUrl; document.head.appendChild(linkManifest);
+        })();
+    </script>
+</head>
+<body>
+    <div id="root">
+        <div class="h-full flex flex-col items-center justify-center">
+            <div class="loader"></div>
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- ICONOS ---
+        const Icon = ({ d, className, size=24 }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{d}</svg>;
+        
+        const Icons = {
+            ChevronLeft: (p) => <Icon {...p} d={<path d="m15 18-6-6 6-6"/>} />,
+            Trash2: (p) => <Icon {...p} d={<><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></>} />,
+            Clock: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></>} />,
+            Check: (p) => <Icon {...p} d={<polyline points="20 6 9 17 4 12"/>} />,
+            MoreVertical: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></>} />,
+            Settings: (p) => <Icon {...p} d={<><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>} />,
+            BarChart2: (p) => <Icon {...p} d={<><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></>} />,
+            CornerDownRight: (p) => <Icon {...p} d={<><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></>} />,
+            Play: (p) => <Icon {...p} d={<polygon points="5 3 19 12 5 21 5 3"/>} />,
+            Menu: (p) => <Icon {...p} d={<><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></>} />,
+            Search: (p) => <Icon {...p} d={<><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></>} />,
+            RefreshCw: (p) => <Icon {...p} d={<><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></>} />,
+            X: (p) => <Icon {...p} d={<><path d="M18 6 6 18"/><path d="m6 6 12 12"/></>} />,
+            Moon: (p) => <Icon {...p} d={<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>} />,
+            Sun: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></>} />,
+            SkipForward: (p) => <Icon {...p} d={<><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></>} />,
+            Plus: (p) => <Icon {...p} d={<><path d="M5 12h14"/><path d="M12 5v14"/></>} />,
+            CloudOff: (p) => <Icon {...p} d={<><path d="m2 2 20 20"/><path d="M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193"/><path d="M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/></>} />,
+            CheckCircle: (p) => <Icon {...p} d={<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>} />,
+            Zap: (p) => <Icon {...p} d={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>} />,
+            Link: (p) => <Icon {...p} d={<><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></>} />,
+            Unlink: (p) => <Icon {...p} d={<><path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"/><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"/><line x1="8" x2="16" y1="2" y2="10"/><line x1="8" x2="16" y1="14" y2="22"/></>} />,
+            Share2: (p) => <Icon {...p} d={<><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></>} />,
+            Minus: (p) => <Icon {...p} d={<path d="M5 12h14"/>} />,
+            Upload: (p) => <Icon {...p} d={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></>} />,
+            Download: (p) => <Icon {...p} d={<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></>} />,
+            Activity: (p) => <Icon {...p} d={<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>} />,
+            Edit: (p) => <Icon {...p} d={<><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></>} />,
+            Save: (p) => <Icon {...p} d={<><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></>} />,
+            Layout: (p) => <Icon {...p} d={<><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></>} />,
+            Dumbbell: (p) => <Icon {...p} d={<><path d="M6.5 6.5a4 4 0 1 1 5.66 5.66"/><path d="M17.5 17.5a4 4 0 1 1 5.66 5.66"/><path d="M10.5 10.5h3a2 2 0 0 1 2 2v3"/><path d="m22 15-4 4"/><path d="m2 9 4-4"/></>} />,
+            FileText: (p) => <Icon {...p} d={<><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></>} />,
+            Eye: (p) => <Icon {...p} d={<><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></>} />,
+            EyeOff: (p) => <Icon {...p} d={<><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></>} />,
+            DownloadCloud: (p) => <Icon {...p} d={<><polyline points="8 17 12 21 16 17"/><line x1="12" x2="12" y1="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></>} />
+        };
+
+        // --- CONFIG Y DATOS ---
+        const MUSCLE_GROUPS = { CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', BICEPS: 'BICEPS', TRICEPS: 'TRICEPS' };
+        const SUPERSET_COLORS = [{ border: 'border-orange-500', bg: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50' }, { border: 'border-purple-500', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50' }, { border: 'border-cyan-500', bg: 'bg-cyan-500', text: 'text-cyan-600', light: 'bg-cyan-50' }, { border: 'border-pink-500', bg: 'bg-pink-500', text: 'text-pink-600', light: 'bg-pink-50' }];
+        
+        const TRANSLATIONS = {
+            en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps" },
+            editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
+            manageEx: "Manage Exercises", addEx: "Add New Exercise", exName: "Exercise Name", selectMuscle: "Select Muscle", deleteConfirm: "Delete this exercise?",
+            setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App" },
+            es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps" },
+            editTemplate: "Editar Programa", resetTemplate: "Restaurar Defecto", editDay: "Editar Día", addDay: "Añadir Día", addSlot: "Añadir Slot", save: "Guardar", swapTitle: "Reemplazar Ejercicio", swapMsg: "¿Cómo quieres aplicar este cambio?", swapSession: "Solo esta Sesión", swapForever: "Actualizar Plan (Para siempre)", programEditor: "Editor de Programa", selectExBtn: "Elegir Ejercicio", any: "Cualquiera", reps: "Reps",
+            manageEx: "Gestionar Ejercicios", addEx: "Añadir Nuevo Ejercicio", exName: "Nombre del Ejercicio", selectMuscle: "Seleccionar Músculo", deleteConfirm: "¿Borrar este ejercicio?",
+            setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App" }
+        };
+
+        const DEFAULT_LIBRARY = [
+            { id: 'bp_flat', name: { en: 'Machine Chest Press', es: 'Press Pecho Máquina' }, muscle: MUSCLE_GROUPS.CHEST },
+            { id: 'bp_inc', name: { en: 'Incline Dumbbell Press', es: 'Press Inclinado Mancuernas' }, muscle: MUSCLE_GROUPS.CHEST },
+            { id: 'bp_bar', name: { en: 'Barbell Bench Press', es: 'Press Banca Barra' }, muscle: MUSCLE_GROUPS.CHEST },
+            { id: 'pec_fly', name: { en: 'Pec Dec Flye', es: 'Aperturas Pec Dec' }, muscle: MUSCLE_GROUPS.CHEST },
+            { id: 'lat_pull', name: { en: 'Lat Pulldown', es: 'Jalón al Pecho' }, muscle: MUSCLE_GROUPS.BACK },
+            { id: 'row_mach', name: { en: 'Machine Row', es: 'Remo en Máquina' }, muscle: MUSCLE_GROUPS.BACK },
+            { id: 'row_cable', name: { en: 'Cable Row', es: 'Remo en Polea' }, muscle: MUSCLE_GROUPS.BACK },
+            { id: 'pullup', name: { en: 'Pull Ups', es: 'Dominadas' }, muscle: MUSCLE_GROUPS.BACK },
+            { id: 'sq_hack', name: { en: 'Hack Squat', es: 'Sentadilla Hack' }, muscle: MUSCLE_GROUPS.QUADS },
+            { id: 'leg_ext', name: { en: 'Leg Extension', es: 'Extensiones de Cuádriceps' }, muscle: MUSCLE_GROUPS.QUADS },
+            { id: 'leg_press', name: { en: 'Leg Press', es: 'Prensa de Piernas' }, muscle: MUSCLE_GROUPS.QUADS },
+            { id: 'rdl', name: { en: 'Romanian Deadlift', es: 'Peso Muerto Rumano' }, muscle: MUSCLE_GROUPS.HAMS },
+            { id: 'leg_curl', name: { en: 'Seated Leg Curl', es: 'Curl Femoral Sentado' }, muscle: MUSCLE_GROUPS.HAMS },
+            { id: 'lying_curl', name: { en: 'Lying Leg Curl', es: 'Curl Femoral Tumbado' }, muscle: MUSCLE_GROUPS.HAMS },
+            { id: 'calf_raise', name: { en: 'Calf Raise', es: 'Elevación de Talones' }, muscle: MUSCLE_GROUPS.CALVES },
+            { id: 'ohp', name: { en: 'Overhead Press', es: 'Press Militar' }, muscle: MUSCLE_GROUPS.SHOULDERS },
+            { id: 'lat_raise', name: { en: 'Lateral Raise', es: 'Elevaciones Laterales' }, muscle: MUSCLE_GROUPS.SHOULDERS },
+            { id: 'face_pull', name: { en: 'Face Pull', es: 'Face Pull' }, muscle: MUSCLE_GROUPS.SHOULDERS },
+            { id: 'curl_ez', name: { en: 'EZ Bar Curl', es: 'Curl Barra EZ' }, muscle: MUSCLE_GROUPS.BICEPS },
+            { id: 'curl_db', name: { en: 'Dumbbell Curl', es: 'Curl con Mancuernas' }, muscle: MUSCLE_GROUPS.BICEPS },
+            { id: 'tri_push', name: { en: 'Tricep Pushdown', es: 'Extensión Tríceps Polea' }, muscle: MUSCLE_GROUPS.TRICEPS },
+            { id: 'tri_ext', name: { en: 'Overhead Extension', es: 'Extensión sobre Cabeza' }, muscle: MUSCLE_GROUPS.TRICEPS }
+        ];
+        
+        const DEFAULT_TEMPLATE = [ 
+            { id: 'd1', dayName: { en: "Upper 1", es: "Torso 1" }, slots: [{ muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }, { muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }, { muscle: MUSCLE_GROUPS.TRICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BACK, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BACK, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.SHOULDERS, setTarget: 3 }] }, 
+            { id: 'd2', dayName: { en: "Lower 1", es: "Pierna 1" }, slots: [{ muscle: MUSCLE_GROUPS.QUADS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.QUADS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.GLUTES, setTarget: 3 }, { muscle: MUSCLE_GROUPS.HAMS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.CALVES, setTarget: 3 }] }, 
+            { id: 'd3', dayName: { en: "Upper 2", es: "Torso 2" }, slots: [{ muscle: MUSCLE_GROUPS.SHOULDERS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.BACK, setTarget: 3 }, { muscle: MUSCLE_GROUPS.TRICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.TRICEPS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }] }, 
+            { id: 'd4', dayName: { en: "Lower 2", es: "Pierna 2" }, slots: [{ muscle: MUSCLE_GROUPS.HAMS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.HAMS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.GLUTES, setTarget: 3 }, { muscle: MUSCLE_GROUPS.QUADS, setTarget: 3 }, { muscle: MUSCLE_GROUPS.CALVES, setTarget: 3 }] } 
+        ];
+
+        // --- COMPONENTS ---
+        const formatDate = (d, l) => new Date(d).toLocaleDateString(l==='en'?'en-US':'es-ES', {weekday:'short',month:'short',day:'numeric'});
+        const formatSeconds = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+
+        const RPIcon = () => <div className="flex items-center gap-2"><div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center text-white font-black italic text-xs shadow-sm">RP</div><h1 className="text-gray-900 dark:text-white font-bold tracking-tight">Hypertrophy <span className="text-gray-400 font-normal">Beta</span></h1></div>;
+        const MuscleTag = ({ label }) => <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 shadow-sm whitespace-nowrap"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></div>{label}</span>;
+        const SetTypeBadge = ({ type }) => { if (type === 'regular' || !type) return null; const labels = { myorep: 'MYO', myorep_match: 'MATCH', cluster: 'CLUS', top: 'TOP', backoff: 'BACK' }; const colors = { myorep: 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300', myorep_match: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300', cluster: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300', top: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300', backoff: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' }; return <span className={`text-[9px] font-black px-1 rounded ml-1 ${colors[type] || 'bg-gray-100'}`}>{labels[type]}</span>; };
+        const ProgressBar = ({ value, max, colorClass = "bg-red-500" }) => <div className="h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden w-full"><div className={`${colorClass} h-full rounded-full`} style={{ width: `${Math.min(100, (value/max)*100)}%` }}></div></div>;
+        
+        const BodyHeatmap = ({ workedMuscles = [] }) => {
+            const getColor = (muscle) => workedMuscles.includes(muscle) ? "#ef4444" : "#4b5563";
+            return (
+                <svg viewBox="0 0 200 400" className="w-24 h-48 mx-auto opacity-90">
+                    <circle cx="100" cy="30" r="20" fill="#4b5563" />
+                    <path d="M60 60 Q100 50 140 60 L130 90 L70 90 Z" fill={getColor(MUSCLE_GROUPS.SHOULDERS)} />
+                    <path d="M70 90 L130 90 L125 130 L75 130 Z" fill={getColor(MUSCLE_GROUPS.CHEST)} />
+                    <rect x="40" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.BICEPS)} />
+                    <rect x="140" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.TRICEPS)} />
+                    <path d="M75 130 L125 130 L120 180 L80 180 Z" fill={getColor(MUSCLE_GROUPS.BACK)} />
+                    <path d="M80 180 L120 180 L130 280 L110 280 L100 200 L90 280 L70 280 Z" fill={getColor(MUSCLE_GROUPS.QUADS)} />
+                    <rect x="70" y="285" width="20" height="50" rx="5" fill={getColor(MUSCLE_GROUPS.CALVES)} />
+                    <rect x="110" y="285" width="20" height="50" rx="5" fill={getColor(MUSCLE_GROUPS.CALVES)} />
+                </svg>
+            );
+        };
+
+        const SwapConfirmationModal = ({ isOpen, onClose, onSessionOnly, onForever, t, exerciseName }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in" onClick={onClose}>
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-xl shadow-2xl p-6 border border-gray-100 dark:border-slate-700 animate-slideUp" onClick={e => e.stopPropagation()}>
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{t.swapTitle}</h3>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{t.swapMsg}</p>
+                        <div className="bg-gray-50 dark:bg-slate-900/50 p-3 rounded-lg mb-4 text-center border border-gray-100 dark:border-slate-700">
+                             <div className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">New Exercise</div>
+                             <div className="font-bold text-red-500">{exerciseName}</div>
+                        </div>
+                        <div className="space-y-3">
+                            <button onClick={onSessionOnly} className="w-full py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 font-bold rounded-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors">{t.swapSession}</button>
+                            <button onClick={onForever} className="w-full py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 shadow-lg shadow-red-900/20 transition-colors">{t.swapForever}</button>
+                            <button onClick={onClose} className="w-full py-2 text-gray-400 hover:text-gray-600 text-sm font-medium">{t.cancel}</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ExerciseManager = ({ exercises, onSave, onCancel, onDelete, t, tm }) => {
+            const [newExName, setNewExName] = useState("");
+            const [newExMuscle, setNewExMuscle] = useState(MUSCLE_GROUPS.CHEST);
+            
+            const handleAdd = () => {
+                if(!newExName.trim()) return;
+                onSave(newExName, newExMuscle);
+                setNewExName("");
+            };
+
+            const getExName = (ex) => typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
+
+            return (
+                <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
+                     <div className="bg-white dark:bg-slate-800 px-4 h-14 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+                        <button onClick={onCancel} className="text-gray-400 hover:text-white"><Icons.X /></button>
+                        <h2 className="font-bold text-gray-900 dark:text-white">{t.manageEx}</h2>
+                        <div className="w-6"></div>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 shrink-0">
+                         <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t.addEx}</div>
+                         <div className="flex flex-col gap-3">
+                             <input className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded-lg py-3 px-4 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500" placeholder={t.exName} value={newExName} onChange={e => setNewExName(e.target.value)} />
+                             <div className="flex gap-2">
+                                <select value={newExMuscle} onChange={e=>setNewExMuscle(e.target.value)} className="flex-1 bg-gray-100 dark:bg-slate-700 border-none rounded-lg py-3 px-4 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 uppercase">
+                                    {Object.keys(MUSCLE_GROUPS).map(m => <option key={m} value={m}>{tm(m)}</option>)}
+                                </select>
+                                <button onClick={handleAdd} className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed" disabled={!newExName.trim()}>{t.createEx}</button>
+                             </div>
+                         </div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-2 scroll-container pb-20">
+                        {exercises.slice().reverse().map(ex => (
+                            <div key={ex.id} className="w-full p-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm flex justify-between items-center group">
+                                <div>
+                                    <div className="font-bold text-gray-700 dark:text-gray-200">{getExName(ex)}</div>
+                                    <MuscleTag label={tm(ex.muscle)} />
+                                </div>
+                                {ex.id.startsWith('custom_') && <button onClick={() => { if(confirm(t.deleteConfirm)) onDelete(ex.id); }} className="p-2 text-gray-400 hover:text-red-500"><Icons.Trash2 size={18} /></button>}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        const TemplateEditor = ({ program, exercises, onSave, onCancel, t, tm }) => {
+            const [localProgram, setLocalProgram] = useState(JSON.parse(JSON.stringify(program)));
+            const [exSelector, setExSelector] = useState(null); 
+
+            const updateDayName = (dayIdx, val) => { const n = [...localProgram]; n[dayIdx].dayName[t.lang === 'es'?'es':'en'] = val; setLocalProgram(n); };
+            const updateSlotMuscle = (dayIdx, slotIdx, muscle) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].muscle = muscle; n[dayIdx].slots[slotIdx].exerciseId = null; setLocalProgram(n); };
+            const updateSlotReps = (dayIdx, slotIdx, reps) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].reps = reps; setLocalProgram(n); };
+            const updateSlotSets = (dayIdx, slotIdx, sets) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].setTarget = Number(sets); setLocalProgram(n); };
+            
+            const handleExSelect = (ex) => {
+                const { dayIdx, slotIdx } = exSelector;
+                const n = [...localProgram];
+                n[dayIdx].slots[slotIdx].exerciseId = ex.id;
+                setLocalProgram(n);
+                setExSelector(null);
+            };
+
+            const addSlot = (dayIdx) => { const n = [...localProgram]; n[dayIdx].slots.push({ muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }); setLocalProgram(n); };
+            const removeSlot = (dayIdx, slotIdx) => { const n = [...localProgram]; n[dayIdx].slots.splice(slotIdx, 1); setLocalProgram(n); };
+            const addDay = () => { setLocalProgram([...localProgram, { id: `d${Date.now()}`, dayName: { en: "New Day", es: "Nuevo Día" }, slots: [{ muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }] }]); };
+            const removeDay = (idx) => { const n = [...localProgram]; n.splice(idx, 1); setLocalProgram(n); };
+
+            const getExName = (id) => {
+                const ex = exercises.find(e => e.id === id);
+                if(!ex) return null;
+                return typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
+            };
+
+            return (
+                <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
+                    <div className="bg-white dark:bg-slate-800 px-4 h-14 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between shrink-0">
+                        <button onClick={onCancel} className="text-gray-400 hover:text-white"><Icons.X /></button>
+                        <h2 className="font-bold text-gray-900 dark:text-white">{t.programEditor}</h2>
+                        <button onClick={() => onSave(localProgram)} className="text-red-600 font-bold text-sm">{t.save}</button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4 scroll-container pb-20">
+                        {localProgram.map((day, dIdx) => (
+                            <div key={day.id || dIdx} className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl overflow-hidden">
+                                <div className="p-3 bg-gray-50 dark:bg-slate-700/50 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                                    <input value={day.dayName[t.lang==='es'?'es':'en']} onChange={e=>updateDayName(dIdx, e.target.value)} className="bg-transparent font-bold text-gray-900 dark:text-white focus:outline-none focus:border-b border-red-500 w-full mr-2" />
+                                    <button onClick={() => removeDay(dIdx)} className="text-gray-400 hover:text-red-500"><Icons.Trash2 size={16} /></button>
+                                </div>
+                                <div className="p-2 space-y-3">
+                                    {day.slots.map((slot, sIdx) => (
+                                        <div key={sIdx} className="flex flex-col gap-2 p-2 bg-gray-50 dark:bg-slate-900/50 rounded-lg border border-gray-100 dark:border-slate-700/50">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-5 h-5 rounded-full bg-gray-200 dark:bg-slate-700 text-gray-500 flex items-center justify-center text-[10px] font-bold">{sIdx+1}</div>
+                                                <select value={slot.muscle} onChange={e=>updateSlotMuscle(dIdx, sIdx, e.target.value)} className="flex-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1 px-2 text-xs font-bold text-gray-700 dark:text-gray-300 focus:ring-1 focus:ring-red-500 uppercase">
+                                                    {Object.keys(MUSCLE_GROUPS).map(m => <option key={m} value={m}>{tm(m)}</option>)}
+                                                </select>
+                                                <button onClick={() => removeSlot(dIdx, sIdx)} className="text-gray-300 hover:text-red-500"><Icons.Minus size={16} /></button>
+                                            </div>
+                                            <div className="flex items-center gap-2 pl-7">
+                                                 <button onClick={() => setExSelector({ dayIdx: dIdx, slotIdx: sIdx, muscleFilter: slot.muscle })} className={`flex-1 text-left px-2 py-1.5 rounded text-xs font-medium border ${slot.exerciseId ? 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white' : 'bg-gray-100 dark:bg-slate-700 border-dashed border-gray-300 dark:border-slate-600 text-gray-400'}`}>
+                                                    {slot.exerciseId ? getExName(slot.exerciseId) : t.selectExBtn}
+                                                 </button>
+                                                 <input 
+                                                    placeholder={t.reps}
+                                                    value={slot.reps || ''} 
+                                                    onChange={e => updateSlotReps(dIdx, sIdx, e.target.value)}
+                                                    className="w-14 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
+                                                 />
+                                                 <input 
+                                                    type="number"
+                                                    placeholder={t.setsCount}
+                                                    value={slot.setTarget || 3} 
+                                                    onChange={e => updateSlotSets(dIdx, sIdx, e.target.value)}
+                                                    className="w-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
+                                                 />
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <button onClick={() => addSlot(dIdx)} className="w-full py-2 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-lg text-xs font-bold text-gray-400 uppercase hover:text-red-500 hover:border-red-500/50 transition-colors flex items-center justify-center gap-1"><Icons.Plus size={14}/> {t.addSlot}</button>
+                                </div>
+                            </div>
+                        ))}
+                        <button onClick={addDay} className="w-full py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl font-bold text-sm flex items-center justify-center gap-2"><Icons.Plus className="w-4 h-4"/> {t.addDay}</button>
+                    </div>
+                    {exSelector && (
+                        <ExerciseSelector 
+                            muscleFilter={exSelector.muscleFilter} 
+                            slotLabel={tm(exSelector.muscleFilter)} 
+                            exercises={exercises} 
+                            onSelect={handleExSelect} 
+                            onCancel={() => setExSelector(null)} 
+                            onCreate={() => {}} 
+                            t={t}
+                            tm={tm}
+                        />
+                    )}
+                </div>
+            );
+        };
+
+        const SummaryView = ({ data, onClose, t }) => {
+            const handleShare = () => {
+                const text = `IRONLOG WORKOUT\n${data.name}\n${Math.floor(data.duration/60)} min • ${data.totalVolume}kg Vol\n${data.totalSets} Sets • ${data.totalReps} Reps`;
+                if (navigator.share) navigator.share({ title: 'IronLog Workout', text });
+                else {
+                    const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Resumen copiado!");
+                }
+            };
+            return (
+                <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 animate-fade-in text-center overflow-hidden">
+                    <div className="relative z-10 w-full max-w-sm flex flex-col h-full justify-center">
+                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50"><Icons.Check className="w-8 h-8 text-white" /></div>
+                        <h1 className="text-2xl font-black text-white italic tracking-tighter mb-1">{t.workoutComplete}</h1>
+                        <p className="text-slate-400 mb-6 font-medium text-sm">{t.goodJob}</p>
+                        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 mb-4">
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.duration}</div><div className="text-lg font-bold text-white font-mono">{formatSeconds(data.duration)}</div></div>
+                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalVolume}</div><div className="text-lg font-bold text-red-400 font-mono">{data.totalVolume}kg</div></div>
+                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalSets}</div><div className="text-lg font-bold text-white">{data.totalSets}</div></div>
+                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalReps}</div><div className="text-lg font-bold text-white">{data.totalReps}</div></div>
+                            </div>
+                            <div className="border-t border-slate-700 pt-4"><BodyHeatmap workedMuscles={data.workedMuscles} /></div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex gap-3">
+                                <button onClick={handleShare} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"><Icons.Share2 className="w-4 h-4" /> {t.share}</button>
+                                <button onClick={onClose} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/20">{t.close}</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const Modal = ({ isOpen, onClose, children }) => {
+            if (!isOpen) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in" onClick={onClose}>
+                    <div className="bg-white dark:bg-slate-800 w-full max-w-sm rounded-xl shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-700 animate-slideUp" onClick={e => e.stopPropagation()}>{children}</div>
+                </div>
+            );
+        };
+
+        const ExerciseSelector = ({ muscleFilter, slotLabel, exercises, onSelect, onCancel, t, tm, onCreate }) => {
+            const [search, setSearch] = useState("");
+            const getExName = (ex) => typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
+            const filtered = exercises.filter(ex => getExName(ex).toLowerCase().includes(search.toLowerCase()) && (muscleFilter ? ex.muscle === muscleFilter : true));
+            return (
+                <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
+                    <div className="bg-white dark:bg-slate-800 px-4 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center gap-3 shrink-0">
+                        <button onClick={onCancel} className="p-1 -ml-1 text-gray-400 hover:text-white"><Icons.ChevronLeft /></button>
+                        <div><div className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">{t.selectEx}</div><div className="text-lg font-bold text-gray-900 dark:text-white">{slotLabel}</div></div>
+                    </div>
+                    <div className="p-4 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-10 shrink-0"><div className="relative"><Icons.Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" /><input autoFocus className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded-lg py-2.5 pl-9 pr-4 text-sm font-medium text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-red-500" placeholder={t.searchPlaceholder} value={search} onChange={e => setSearch(e.target.value)} /></div></div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-2 scroll-container">
+                        {search && <button onClick={() => onCreate(search, muscleFilter)} className="w-full text-left p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900 rounded-xl shadow-sm flex items-center gap-3 group"><div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center"><Icons.Plus className="w-5 h-5" /></div><div><div className="font-bold text-blue-700 dark:text-blue-300">{t.createEx} "{search}"</div><div className="text-xs text-blue-500 dark:text-blue-400 uppercase">{muscleFilter ? tm(muscleFilter) : t.any}</div></div></button>}
+                        {filtered.map(ex => (
+                            <button key={ex.id} onClick={() => onSelect(ex)} className="w-full text-left p-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-red-300 dark:hover:border-red-500 transition-all flex justify-between items-center group">
+                                <span className="font-bold text-gray-700 dark:text-gray-200 group-hover:text-red-600 dark:group-hover:text-red-400">{getExName(ex)}</span>
+                                <MuscleTag label={tm(ex.muscle)} />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        function App() {
+            const [lang, setLang] = useState('en');
+            const [theme, setTheme] = useState('dark');
+            const t = { ...TRANSLATIONS[lang], lang };
+            const tm = (key) => TRANSLATIONS[lang].muscle[key] || key;
+            const [view, setView] = useState('home');
+            
+            const useLS = (key, initial) => {
+                const [val, setVal] = useState(() => { try { return JSON.parse(localStorage.getItem(key)) || initial; } catch { return initial; } });
+                useEffect(() => localStorage.setItem(key, JSON.stringify(val)), [key, val]);
+                return [val, setVal];
+            };
+
+            const [program, setProgram] = useLS('il_prog_v15', DEFAULT_TEMPLATE);
+            const [activeMeso, setActiveMeso] = useLS('il_meso_v15', null);
+            const [activeSession, setActiveSession] = useLS('il_session_v15', null);
+            const [exercises, setExercises] = useLS('il_ex_v15', DEFAULT_LIBRARY);
+            const [logs, setLogs] = useLS('il_logs_v15', []);
+            const [showRIR, setShowRIR] = useLS('il_cfg_rir', true);
+
+            const [restTimer, setRestTimer] = useState({ active: false, timeLeft: 0, duration: 120 });
+            const [menuOpenId, setMenuOpenId] = useState(null);
+            const [setMenuContext, setSetMenuContext] = useState(null);
+            const [dayMenuOpenIdx, setDayMenuOpenIdx] = useState(null); 
+            const [showSettings, setShowSettings] = useState(false);
+            const [selectionContext, setSelectionContext] = useState(null);
+            const [linkingMode, setLinkingMode] = useState(null);
+            const [summaryData, setSummaryData] = useState(null);
+            const [preventSleep, setPreventSleep] = useState(true);
+            const [sessionElapsed, setSessionElapsed] = useState(0);
+            const [editingTemplate, setEditingTemplate] = useState(false);
+            const [managingExercises, setManagingExercises] = useState(false);
+            const [swapConfirmation, setSwapConfirmation] = useState(null);
+            const [installPrompt, setInstallPrompt] = useState(null);
+            const wakeLockRef = useRef(null);
+
+            useEffect(() => { document.documentElement.className = theme; }, [theme]);
+            useEffect(() => { let i; if(restTimer.active && restTimer.timeLeft > 0) i = setInterval(() => setRestTimer(p=>({...p, timeLeft:p.timeLeft-1})), 1000); else if(restTimer.timeLeft===0) setRestTimer(p=>({...p, active:false})); return () => clearInterval(i); }, [restTimer.active, restTimer.timeLeft]);
+            useEffect(() => { let i; if(activeSession?.startTime) i = setInterval(() => setSessionElapsed(Math.floor((Date.now()-activeSession.startTime)/1000)), 1000); else setSessionElapsed(0); return () => clearInterval(i); }, [activeSession?.startTime]);
+            useEffect(() => { const req = async () => { if ('wakeLock' in navigator && view === 'workout' && preventSleep) try { wakeLockRef.current = await navigator.wakeLock.request('screen'); } catch(e){} }; if(view==='workout' && preventSleep) { req(); document.addEventListener('visibilitychange', () => document.visibilityState==='visible'&&req()); } return () => { if(wakeLockRef.current) wakeLockRef.current.release(); }; }, [view, preventSleep]);
+
+            // PWA Install Logic
+            useEffect(() => {
+                const handler = (e) => {
+                    e.preventDefault();
+                    setInstallPrompt(e);
+                };
+                window.addEventListener('beforeinstallprompt', handler);
+                return () => window.removeEventListener('beforeinstallprompt', handler);
+            }, []);
+
+            const handleInstall = async () => {
+                if (!installPrompt) {
+                    alert("Para instalar en iOS: Pulsa Compartir y selecciona 'Añadir a pantalla de inicio'.");
+                    return;
+                }
+                installPrompt.prompt();
+                const { outcome } = await installPrompt.userChoice;
+                if (outcome === 'accepted') setInstallPrompt(null);
+            };
+
+            const getExName = (ex) => {
+                if (!ex) return "Unknown";
+                return typeof ex.name === 'object' ? (ex.name[lang] || ex.name['en']) : ex.name;
+            };
+
+            const startMesocycle = () => { const initialPlan = program.map(day => day.slots.map(slot => slot.exerciseId || null)); setActiveMeso({ id: Date.now(), week: 1, plan: initialPlan }); };
+            const createExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); if(selectionContext) handleExerciseSelect(newEx); };
+            const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
+            const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
+            const checkWeekCompletion = (currentMeso, currentLogs) => { if (!currentMeso) return; const weekLogs = currentLogs.filter(l => l.mesoId === currentMeso.id && l.week === currentMeso.week); if (program.every((_, d) => weekLogs.some(l => l.dayIdx === d))) setTimeout(() => setActiveMeso(p => ({ ...p, week: p.week + 1 })), 1000); };
+            const startSession = (dayIdx) => { const dayPlan = activeMeso.plan[dayIdx]; if (!dayPlan) return; const firstEmptyIdx = dayPlan.findIndex(s => s === null); if (firstEmptyIdx !== -1) { const slotDef = program[dayIdx].slots[firstEmptyIdx]; setSelectionContext({ dayIdx, slotIdx: firstEmptyIdx, muscle: slotDef.muscle, label: tm(slotDef.muscle) }); return; } if (activeSession && activeSession.dayIdx === dayIdx) { setView('workout'); return; } const sessionExs = dayPlan.map((exId, idx) => { const exDef = exercises.find(e => e.id === exId) || exercises[0]; const slotDef = program[dayIdx].slots[idx]; const targetSets = slotDef.setTarget || 3; const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets }; }); setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); setView('workout'); };
+            const skipSession = (dayIdx) => { const log = { id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, startTime: Date.now(), endTime: Date.now(), duration: 0, skipped: true, exercises: [], mesoId: activeMeso.id, week: activeMeso.week }; const newLogs = [log, ...logs]; setLogs(newLogs); setDayMenuOpenIdx(null); checkWeekCompletion(activeMeso, newLogs); };
+            const handleExerciseSelect = (exercise) => { if (!selectionContext) return; const { dayIdx, slotIdx } = selectionContext; if (activeSession && activeSession.dayIdx === dayIdx) { setSwapConfirmation({ exercise, context: selectionContext }); setSelectionContext(null); return; } const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); setSelectionContext(null); setTimeout(() => startSession(dayIdx), 50); };
+            const confirmSwap = (mode) => { if (!swapConfirmation) return; const { exercise, context } = swapConfirmation; const { dayIdx, slotIdx } = context; const newExs = [...activeSession.exercises]; const prevEx = newExs[slotIdx]; newExs[slotIdx] = { ...exercise, slotLabel: prevEx.slotLabel, targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})) }; setActiveSession({ ...activeSession, exercises: newExs }); if (mode === 'forever') { const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); } setSwapConfirmation(null); };
+            const toggleSet = (exId, setId) => { const ex = activeSession.exercises.find(e => e.instanceId === exId); const set = ex.sets.find(s => s.id === setId); if(set.skipped) return; const completing = !set.completed; let start = activeSession.startTime; if(completing && !start) start = Date.now(); setActiveSession(p => ({...p, startTime: start, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? { ...s, completed: completing } : s)} : e)})); if(completing) setRestTimer({ active: true, timeLeft: 120, duration: 120 }); };
+            const updateSet = (exId, setId, f, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? {...s, [f]: v} : s)} : e)}));
+            const updateNote = (exId, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, note: v} : e)}));
+            const addSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: [...e.sets, { id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }]} : e)}));
+            const removeLastSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.slice(0, -1)} : e)}));
+            const addSetAt = (exId, anchor) => setActiveSession(p => { const exIdx = p.exercises.findIndex(e => e.instanceId === exId); const newSets = [...p.exercises[exIdx].sets]; const anchorIdx = newSets.findIndex(s => s.id === anchor); newSets.splice(anchorIdx + 1, 0, { id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }); const newExs = [...p.exercises]; newExs[exIdx] = { ...p.exercises[exIdx], sets: newSets }; return { ...p, exercises: newExs }; });
+            const deleteSetAt = (exId, id) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.filter(s => s.id !== id)} : e)}));
+            const toggleSkipSet = (exId, id) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === id ? {...s, skipped: !s.skipped} : s)} : e)}));
+            const changeSetType = (exId, id, type) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === id ? {...s, type} : s)} : e)}));
+            const deleteSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.slice(0, -1)} : e)}));
+            const initiateSwap = (exId) => { const idx = activeSession.exercises.findIndex(e => e.instanceId === exId); setSelectionContext({ dayIdx: activeSession.dayIdx, slotIdx: idx, muscle: program[activeSession.dayIdx].slots[idx].muscle, label: tm(program[activeSession.dayIdx].slots[idx].muscle) }); setMenuOpenId(null); };
+            const initiateLink = (id) => { setLinkingMode({ source: id }); setMenuOpenId(null); };
+            const confirmLink = (targetId) => { const src = activeSession.exercises.find(e => e.instanceId === linkingMode.source); const tgt = activeSession.exercises.find(e => e.instanceId === targetId); if(src && tgt) { const ssid = src.supersetId || tgt.supersetId || `ss_${Date.now()}`; src.supersetId = ssid; tgt.supersetId = ssid; setActiveSession({...activeSession}); } setLinkingMode(null); };
+            const unlink = (id) => { const ex = activeSession.exercises.find(e => e.instanceId === id); if(ex) delete ex.supersetId; setActiveSession({...activeSession}); setMenuOpenId(null); };
+            const getSupersetColor = (ssid) => { if(!activeSession) return SUPERSET_COLORS[0]; const u = [...new Set(activeSession.exercises.map(e=>e.supersetId).filter(Boolean))]; return SUPERSET_COLORS[u.indexOf(ssid) % SUPERSET_COLORS.length]; };
+            const finishWorkout = () => { const duration = activeSession.startTime ? (Date.now() - activeSession.startTime)/1000 : 0; let vol=0, sets=0, reps=0, muscles=[]; activeSession.exercises.forEach(ex => { let worked=false; ex.sets.forEach(s => { if(s.completed) { vol += (Number(s.weight)||0)*(Number(s.reps)||0); sets++; reps+=(Number(s.reps)||0); worked=true; } }); if(worked) muscles.push(ex.muscle); }); setSummaryData({ name: activeSession.name, duration, totalVolume: vol, totalSets: sets, totalReps: reps, workedMuscles: [...new Set(muscles)], sessionData: { ...activeSession, endTime: Date.now(), duration } }); };
+            const closeSummary = () => { const log = summaryData.sessionData; const newLogs = [log, ...logs]; setLogs(newLogs); setActiveSession(null); setRestTimer({active:false}); setSummaryData(null); setView('home'); checkWeekCompletion(activeMeso, newLogs); };
+            const exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ activeMeso, activeSession, exercises, logs, program })); const da = document.createElement('a'); da.setAttribute("href", dataStr); da.setAttribute("download", "ironlog_backup.json"); document.body.appendChild(da); da.click(); da.remove(); };
+            const importData = (e) => { const fr = new FileReader(); fr.readAsText(e.target.files[0], "UTF-8"); fr.onload = ev => { if(confirm(t.importConfirm)) { const p = JSON.parse(ev.target.result); setActiveMeso(p.activeMeso); setActiveSession(p.activeSession); setExercises(p.exercises); setLogs(p.logs); if(p.program) setProgram(p.program); alert(t.dataSaved); } }; };
+            const getVolumeStatus = (sets) => { if (sets < 6) return { label: t.volumeStatus.low, color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-slate-700' }; if (sets < 10) return { label: t.volumeStatus.maintenance, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' }; if (sets <= 20) return { label: t.volumeStatus.optimal, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' }; return { label: t.volumeStatus.high, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }; };
+            const weeklyVolumeData = useMemo(() => { if (!activeMeso || logs.length === 0) return { week: 1, data: {} }; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); const currentWeekLogs = mesoLogs.filter(l => l.week === activeMeso.week); let targetWeek = activeMeso.week; let targetLogs = currentWeekLogs; if (currentWeekLogs.length === 0 && activeMeso.week > 1) { targetWeek = activeMeso.week - 1; targetLogs = mesoLogs.filter(l => l.week === targetWeek); } const vol = {}; targetLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) vol[ex.muscle] = (vol[ex.muscle] || 0) + sets; }); }); return { week: targetWeek, data: vol }; }, [logs, activeMeso]);
+            const mesoAverageVolume = useMemo(() => { if (!activeMeso || logs.length === 0) return {}; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); if (mesoLogs.length === 0) return {}; const weeks = new Set(mesoLogs.map(l => l.week)).size || 1; const totalVol = {}; mesoLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) totalVol[ex.muscle] = (totalVol[ex.muscle] || 0) + sets; }); }); const avgVol = {}; Object.keys(totalVol).forEach(m => { avgVol[m] = Math.round((totalVol[m] / weeks) * 10) / 10; }); return avgVol; }, [logs, activeMeso]);
+            const mesoStats = useMemo(() => activeMeso ? { totalWorkouts: logs.filter(l => l.mesoId === activeMeso.id && !l.skipped).length } : null, [logs, activeMeso]);
+
+            return (
+                <div className={`w-full h-full flex flex-col ${theme}`}>
+                    <div className="h-full flex flex-col bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 overflow-hidden">
+                        {/* SIDEBAR */}
+                        <div className={`fixed inset-y-0 left-0 w-64 bg-white dark:bg-slate-900 shadow-2xl z-50 transform transition-transform duration-300 ${showSettings ? 'translate-x-0' : '-translate-x-full'}`}>
+                            <div className="p-5 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center"><h2 className="font-bold text-lg dark:text-white">{t.settings}</h2><button onClick={() => setShowSettings(false)}><Icons.X className="w-5 h-5 text-gray-500" /></button></div>
+                            <div className="p-4 space-y-6">
+                                <div><label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">{t.language}</label><div className="flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1"><button onClick={() => setLang('en')} className={`flex-1 py-2 text-sm font-bold rounded-md ${lang === 'en' ? 'bg-white dark:bg-slate-700 shadow text-gray-900 dark:text-white' : 'text-gray-500'}`}>English</button><button onClick={() => setLang('es')} className={`flex-1 py-2 text-sm font-bold rounded-md ${lang === 'es' ? 'bg-white dark:bg-slate-700 shadow text-gray-900 dark:text-white' : 'text-gray-500'}`}>Español</button></div></div>
+                                <div><label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">{t.theme}</label><div className="flex bg-gray-100 dark:bg-slate-800 rounded-lg p-1"><button onClick={() => setTheme('light')} className={`flex-1 py-2 text-sm font-bold rounded-md flex items-center justify-center gap-2 ${theme === 'light' ? 'bg-white shadow text-yellow-500' : 'text-gray-500'}`}><Icons.Sun className="w-4 h-4"/> Light</button><button onClick={() => setTheme('dark')} className={`flex-1 py-2 text-sm font-bold rounded-md flex items-center justify-center gap-2 ${theme === 'dark' ? 'bg-slate-700 shadow text-blue-400' : 'text-gray-500'}`}><Icons.Moon className="w-4 h-4"/> Dark</button></div></div>
+                                
+                                <div className="border-t border-b border-gray-100 dark:border-slate-800 py-4">
+                                    <button onClick={handleInstall} className="w-full mb-3 py-3 bg-blue-600 text-white rounded-lg font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-colors">
+                                        <Icons.DownloadCloud className="w-4 h-4" /> {t.install}
+                                    </button>
+                                </div>
+
+                                <div>
+                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">{t.configure}</label>
+                                    <button onClick={() => setShowRIR(!showRIR)} className={`w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors ${!showRIR ? 'opacity-70' : ''}`}>
+                                        {showRIR ? <Icons.Eye className="w-4 h-4" /> : <Icons.EyeOff className="w-4 h-4" />} {t.showRIR}
+                                    </button>
+                                    <button onClick={() => { setShowSettings(false); setManagingExercises(true); }} className="w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors">
+                                        <Icons.Dumbbell className="w-4 h-4" /> {t.manageEx}
+                                    </button>
+                                    <button onClick={() => { setShowSettings(false); setEditingTemplate(true); }} className="w-full py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-indigo-100 dark:border-indigo-900/30">
+                                        <Icons.Layout className="w-4 h-4" /> {t.editTemplate}
+                                    </button>
+                                    <button onClick={() => { if(confirm("Reset template?")) setProgram(DEFAULT_TEMPLATE); }} className="mt-2 w-full py-2 text-xs font-bold text-gray-400 uppercase hover:text-red-500">{t.resetTemplate}</button>
+                                </div>
+
+                                <div><label className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 block">{t.backup}</label><div className="flex gap-2"><button onClick={exportData} className="flex-1 py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg font-bold text-xs flex items-center justify-center gap-2"><Icons.Download className="w-4 h-4"/> {t.export}</button><label className="flex-1 py-3 bg-gray-100 dark:bg-slate-800 text-gray-600 dark:text-gray-400 rounded-lg font-bold text-xs flex items-center justify-center gap-2 cursor-pointer"><Icons.Upload className="w-4 h-4"/> {t.import}<input type="file" className="hidden" accept=".json" onChange={importData} /></label></div></div>
+                                {activeMeso && <button onClick={() => { if(confirm(t.confirmCycle)) setActiveMeso(null); }} className="w-full py-3 text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 rounded-lg font-bold text-sm">{t.finishCycle}</button>}
+                                <div className="pt-4 border-t border-gray-100 dark:border-slate-800"><div className="flex items-center gap-2 justify-center text-xs font-bold uppercase tracking-widest text-gray-400"><Icons.CloudOff className="w-4 h-4" /> {t.offline}</div></div>
+                            </div>
+                        </div>
+                        {showSettings && <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowSettings(false)}></div>}
+                        
+                        {selectionContext && <ExerciseSelector muscleFilter={selectionContext.muscle} slotLabel={tm(selectionContext.muscle)} exercises={exercises} onSelect={handleExerciseSelect} onCancel={() => setSelectionContext(null)} onCreate={createExercise} t={t} tm={tm} />}
+                        {editingTemplate && <TemplateEditor program={program} exercises={exercises} onSave={(p) => { setProgram(p); setEditingTemplate(false); }} onCancel={() => setEditingTemplate(false)} t={t} tm={tm} />}
+                        {managingExercises && <ExerciseManager exercises={exercises} onSave={manualCreateExercise} onDelete={deleteCustomExercise} onCancel={() => setManagingExercises(false)} t={t} tm={tm} />}
+                        {swapConfirmation && <SwapConfirmationModal isOpen={!!swapConfirmation} onClose={() => setSwapConfirmation(null)} onSessionOnly={() => confirmSwap('session')} onForever={() => confirmSwap('forever')} t={t} exerciseName={getExName(swapConfirmation?.exercise)} />}
+                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} />}
+
+                        {/* HEADER & NAV */}
+                        {view !== 'workout' && (
+                            <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shrink-0">
+                                <div className="px-4 h-14 flex items-center justify-between"><RPIcon /><button onClick={() => setShowSettings(true)}><Icons.Menu className="w-6 h-6 text-gray-400" /></button></div>
+                                <div className="flex border-t border-gray-100 dark:border-slate-700"><button onClick={() => setView('home')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'home' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.active}</button><button onClick={() => setView('history')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'history' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.history}</button></div>
+                            </div>
+                        )}
+
+                        <div className="flex-1 overflow-y-auto custom-scrollbar scroll-container pb-20">
+                            {view === 'home' && (
+                                <div className="p-4 space-y-4">
+                                    {activeMeso ? <div className="text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900 p-2 rounded text-center mb-2">{t.massPhase} • {t.week} {activeMeso.week}</div> : <div className="text-center py-10"><button onClick={startMesocycle} className="w-full py-4 bg-red-600 text-white font-bold rounded-lg shadow-lg hover:bg-red-700">{t.startMeso}</button></div>}
+                                    {activeMeso && <div className="space-y-3 pb-10">{program.map((day, idx) => {
+                                        const logForToday = logs.find(l => l.mesoId === activeMeso.id && l.week === activeMeso.week && l.dayIdx === idx);
+                                        const isCompleted = logForToday && !logForToday.skipped;
+                                        const isSkipped = logForToday && logForToday.skipped;
+                                        const isActive = activeSession?.dayIdx === idx;
+                                        const isConfigured = activeMeso.plan[idx] && activeMeso.plan[idx].every(s => s !== null);
+                                        return (
+                                            <div key={idx} className={`bg-white dark:bg-slate-800 border rounded-lg p-4 shadow-sm relative overflow-hidden ${isActive ? 'border-red-500 ring-1 ring-red-100 dark:ring-red-900' : isCompleted ? 'border-green-500/50 bg-green-50/50 dark:bg-green-900/10' : isSkipped ? 'border-gray-200 opacity-60 grayscale' : 'border-gray-200 dark:border-slate-700'}`}>
+                                                {isActive && <div className="absolute top-0 right-0 px-2 py-1 bg-red-600 text-white text-[10px] font-bold uppercase rounded-bl">{t.active}</div>}
+                                                {isCompleted && <div className="absolute top-0 right-0 px-2 py-1 bg-green-600 text-white text-[10px] font-bold uppercase rounded-bl flex items-center gap-1"><Icons.CheckCircle className="w-3 h-3"/> {t.completed}</div>}
+                                                {isSkipped && <div className="absolute top-0 right-0 px-2 py-1 bg-gray-200 text-gray-600 text-[10px] font-bold uppercase rounded-bl flex items-center gap-1"><Icons.SkipForward className="w-3 h-3"/> {t.skipped}</div>}
+                                                {!isConfigured && !isActive && !isCompleted && !isSkipped && <div className="absolute top-0 right-0 px-2 py-1 bg-yellow-400 text-yellow-900 text-[10px] font-bold uppercase rounded-bl">{t.configure}</div>}
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h3 onClick={() => !logForToday && startSession(idx)} className={`text-base font-bold flex-1 ${!logForToday ? 'cursor-pointer' : ''} ${isActive ? 'text-red-600 dark:text-red-400' : isCompleted ? 'text-green-700 dark:text-green-400' : 'text-gray-800 dark:text-gray-200'}`}>{day.dayName[lang]}</h3>
+                                                    {!logForToday && <button onClick={() => setDayMenuOpenIdx(idx)} className="p-1 text-gray-400 hover:text-white"><Icons.MoreVertical className="w-5 h-5" /></button>}
+                                                </div>
+                                                <div onClick={() => !logForToday && startSession(idx)} className={`flex flex-wrap gap-1.5 ${!logForToday ? 'cursor-pointer' : ''}`}>
+                                                    {day.slots.map((s, i) => <span key={i} className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded border ${activeMeso.plan[idx] && activeMeso.plan[idx][i] ? 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-slate-600' : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-500 border-yellow-100 dark:border-yellow-900'}`}>{tm(s.muscle)}</span>)}
+                                                </div>
+                                                <Modal isOpen={dayMenuOpenIdx === idx} onClose={() => setDayMenuOpenIdx(null)}><div className="p-2 space-y-1 bg-white dark:bg-slate-800"><button onClick={() => startSession(idx)} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.Play className="w-4 h-4 text-green-500" /> Start</button><button onClick={() => skipSession(idx)} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-red-600 dark:text-red-400 font-medium text-sm"><Icons.SkipForward className="w-4 h-4" /> {t.skipDay}</button></div></Modal>
+                                            </div>
+                                        );
+                                    })}</div>}
+                                </div>
+                            )}
+                            {view === 'history' && (
+                                <div className="p-4 space-y-6">
+                                    {activeMeso && <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex justify-between"><div><div className="text-xs font-bold text-gray-400 uppercase">{t.mesoStats}</div><div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{mesoStats?.totalWorkouts||0}</div><div className="text-xs text-gray-500">{t.totalWorkouts}</div></div><div className="text-right"><div className="text-xs font-bold text-gray-400 uppercase">{t.currentWeek}</div><div className="text-2xl font-black text-red-600 font-mono">{activeMeso.week}</div></div></div>}
+                                    
+                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <div className="flex items-center gap-2 mb-4"><Icons.BarChart2 className="w-5 h-5 text-red-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.volume} ({t.week} {weeklyVolumeData.week})</h3></div>
+                                        {Object.keys(weeklyVolumeData.data).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
+                                            <div className="space-y-4">{Object.entries(weeklyVolumeData.data).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => {
+                                                const status = getVolumeStatus(sets);
+                                                return (
+                                                    <div key={muscle}>
+                                                        <div className="flex justify-between items-end mb-1">
+                                                            <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">{tm(muscle)}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${status.bg} ${status.color}`}>{status.label}</span>
+                                                                <span className="text-xs font-bold text-gray-900 dark:text-white">{sets} {t.sets}</span>
+                                                            </div>
+                                                        </div>
+                                                        <ProgressBar value={sets} max={25} />
+                                                    </div>
+                                                );
+                                            })}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <div className="flex items-center gap-2 mb-4"><Icons.Activity className="w-5 h-5 text-blue-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.mesoAvg}</h3></div>
+                                        {Object.keys(mesoAverageVolume).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
+                                            <div className="space-y-3">{Object.entries(mesoAverageVolume).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => (<div key={muscle}><div className="flex justify-between text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1"><span>{tm(muscle)}</span><span>{sets} {t.sets} / {t.week}</span></div><ProgressBar value={sets} max={20} colorClass="bg-blue-500" /></div>))}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">{logs.map(log => (<div key={log.id} className={`p-3 rounded-lg border flex justify-between items-center ${log.skipped?'bg-gray-100 dark:bg-slate-800/50':'bg-white dark:bg-slate-800 shadow-sm border-gray-200 dark:border-slate-700'}`}><div><div className={`font-bold text-sm ${log.skipped?'text-gray-400 line-through':'text-gray-900 dark:text-gray-100'}`}>{log.name}</div><div className="text-xs text-gray-500">{formatDate(log.endTime, lang)}</div></div>{log.skipped ? <span className="text-[10px] font-bold bg-gray-200 text-gray-500 px-2 py-1 rounded">{t.skipped}</span> : <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded">{Math.floor(log.duration/60)}m</span>}</div>))}</div>
+                                </div>
+                            )}
+                            {view === 'workout' && activeSession && (
+                                <div className="bg-[#FAFAFA] dark:bg-slate-900 min-h-screen pb-32">
+                                    <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shadow-sm px-4 h-14 flex items-center justify-between"><button onClick={() => setView('home')} className="text-gray-400 flex items-center gap-1 text-xs font-bold uppercase"><Icons.ChevronLeft className="w-4 h-4" /> {t.back}</button><div className="text-center"><div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.massPhase}</div><div className="text-sm font-bold text-gray-900 dark:text-white">{activeSession.name}</div></div><div className="flex items-center gap-2"><div className="bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded font-mono text-xs font-bold text-gray-600 dark:text-gray-300 min-w-[48px] text-center">{formatSeconds(sessionElapsed)}</div><button onClick={() => setPreventSleep(!preventSleep)} className={`p-1.5 rounded-full ${preventSleep ? 'bg-yellow-100 text-yellow-600' : 'text-gray-400'}`}><Icons.Zap className={`w-4 h-4 ${preventSleep ? 'fill-current' : ''}`} /></button><button onClick={finishWorkout} className="text-red-600 font-bold text-xs uppercase">{t.finishWorkout}</button></div></div>
+                                    <div className="p-2 sm:p-4 space-y-4">
+                                        {linkingMode && <div className="bg-blue-600 text-white p-3 rounded-lg text-sm font-bold flex justify-between items-center sticky top-16 z-30 shadow-lg"><span>{t.selectToLink}</span><button onClick={() => setLinkingMode(null)} className="bg-white/20 p-1 rounded"><Icons.X className="w-4 h-4" /></button></div>}
+                                        {activeSession.exercises.map((ex) => {
+                                            const ssColor = ex.supersetId ? getSupersetColor(ex.supersetId) : null;
+                                            const isLinkable = linkingMode && linkingMode.source !== ex.instanceId;
+                                            return (
+                                                <div key={ex.instanceId} onClick={() => isLinkable && confirmLink(ex.instanceId)} className={`bg-white dark:bg-slate-800 rounded-lg shadow-sm border overflow-hidden relative ${isLinkable ? 'ring-2 ring-blue-500 cursor-pointer animate-pulse' : 'border-gray-200 dark:border-slate-700'} ${ssColor ? `border-l-4 ${ssColor.border}` : ''}`}>
+                                                    <div className="p-3 border-b border-gray-100 dark:border-slate-700 flex justify-between items-start bg-white dark:bg-slate-800"><div><div className="flex gap-2 mb-1"><MuscleTag label={ex.slotLabel || tm(ex.muscle)} />{ex.targetReps && <span className="text-[10px] font-bold bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-1.5 py-0.5 rounded border border-gray-200 dark:border-slate-600">🎯 {ex.targetReps}</span>}{ex.supersetId && <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider ${ssColor.light} ${ssColor.text}`}><Icons.Link className="w-3 h-3 mr-1" /> {t.superset}</span>}</div><h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 leading-tight">{getExName(ex)}</h3></div>{!linkingMode && <button onClick={() => setMenuOpenId(ex.instanceId)} className="p-1 text-gray-300 dark:text-slate-500 hover:text-white"><Icons.MoreVertical className="w-5 h-5" /></button>}</div>
+                                                    <div className="grid grid-cols-10 gap-1 px-3 py-2 bg-[#F9FAFB] dark:bg-slate-900/50 border-b border-gray-100 dark:border-slate-700 text-[9px] font-bold text-gray-400 uppercase text-center tracking-wider">
+                                                        <div className="col-span-1">{t.sets}</div>
+                                                        <div className={showRIR ? "col-span-3" : "col-span-4"}>{t.weight}</div>
+                                                        <div className={showRIR ? "col-span-3" : "col-span-4"}>{t.reps}</div>
+                                                        {showRIR && <div className="col-span-2">{t.rir}</div>}
+                                                        <div className="col-span-1">{t.log}</div>
+                                                    </div>
+                                                    <div className="divide-y divide-gray-50 dark:divide-slate-700">{ex.sets.map((set, idx) => (
+                                                        <div key={set.id} className={`grid grid-cols-10 gap-1 px-3 py-2 items-center ${set.completed ? 'bg-green-50/30 dark:bg-green-900/10' : set.skipped ? 'opacity-40 grayscale' : 'bg-white dark:bg-slate-800'}`}>
+                                                            <div className="col-span-1 flex justify-center"><button onClick={() => setSetMenuContext({ exId: ex.instanceId, setId: set.id, type: set.type, skipped: set.skipped })} className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${set.type !== 'regular' && !set.skipped ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-900' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400'}`}>{idx + 1}</button></div>
+                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.weight} onChange={(e) => updateSet(ex.instanceId, set.id, 'weight', e.target.value)} /></div>
+                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.reps} onChange={(e) => updateSet(ex.instanceId, set.id, 'reps', e.target.value)} /></div>
+                                                            {showRIR && <div className="col-span-2"><input type="number" disabled={set.skipped} className="w-full bg-transparent border-none py-1 text-center text-xs font-bold text-gray-500 dark:text-gray-400 placeholder-gray-200 dark:placeholder-slate-600" value={set.rpe} onChange={(e) => updateSet(ex.instanceId, set.id, 'rpe', e.target.value)} /></div>}
+                                                            <div className="col-span-1 flex justify-center"><button disabled={set.skipped} onClick={() => toggleSet(ex.instanceId, set.id)} className={`w-6 h-6 rounded border flex items-center justify-center ${set.completed ? 'bg-green-500 border-green-500 text-white' : 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-transparent hover:border-gray-400'}`}><Icons.Check className="w-4 h-4" /></button></div>
+                                                            {set.type !== 'regular' && !set.skipped && <div className="col-span-10 flex justify-start pl-2 pb-1"><SetTypeBadge type={set.type} /></div>}
+                                                        </div>
+                                                    ))}</div>
+                                                    
+                                                    {/* NOTES SECTION */}
+                                                    <div className="px-3 py-2 bg-gray-50 dark:bg-slate-900/30 border-t border-gray-100 dark:border-slate-700">
+                                                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-1 font-bold uppercase tracking-wider">
+                                                            <Icons.FileText className="w-3 h-3" /> {t.notes}
+                                                        </div>
+                                                        <textarea 
+                                                            className="w-full bg-transparent text-sm text-gray-700 dark:text-gray-300 placeholder-gray-400 border-none p-0 resize-none focus:ring-0" 
+                                                            placeholder={t.addNote}
+                                                            rows="1"
+                                                            value={ex.note || ''}
+                                                            onChange={(e) => {
+                                                                e.target.style.height = 'auto';
+                                                                e.target.style.height = e.target.scrollHeight + 'px';
+                                                                updateNote(ex.instanceId, e.target.value);
+                                                            }}
+                                                        />
+                                                    </div>
+
+                                                    <div className="p-3 border-t border-gray-100 dark:border-slate-700 flex justify-end gap-2 bg-white dark:bg-slate-800"><button onClick={() => addSet(ex.instanceId)} className="flex items-center gap-1 px-3 py-1.5 rounded bg-gray-100 dark:bg-slate-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"><Icons.Plus className="w-3 h-3"/> {t.addSet}</button><button onClick={() => removeLastSet(ex.instanceId)} className="flex items-center gap-1 px-3 py-1.5 rounded bg-gray-100 dark:bg-slate-700 text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600"><Icons.Minus className="w-3 h-3"/> {t.remSet}</button></div>
+                                                    <Modal isOpen={menuOpenId === ex.instanceId} onClose={() => setMenuOpenId(null)}>
+                                                        <div className="p-2 space-y-1 bg-white dark:bg-slate-800"><button onClick={() => initiateSwap(ex.instanceId)} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.RefreshCw className="w-4 h-4 text-blue-600" /> {t.swap}</button><div className="h-px bg-gray-100 dark:bg-slate-700 my-1"></div><button onClick={() => initiateLink(ex.instanceId)} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.Link className="w-4 h-4 text-purple-500" /> {t.linkSuperset}</button>{ex.supersetId && <button onClick={() => unlink(ex.instanceId)} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.Unlink className="w-4 h-4 text-orange-500" /> {t.unlinkSuperset}</button>}<div className="h-px bg-gray-100 dark:bg-slate-700 my-1"></div><button onClick={() => { addSet(ex.instanceId); setMenuOpenId(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors"><Icons.CornerDownRight className="w-4 h-4" /> {t.addSetBelow}</button><button onClick={() => { setMenuOpenId(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm transition-colors"><Icons.Play className="w-4 h-4" /> {t.skip}</button><div className="h-px bg-gray-100 dark:bg-slate-700 my-1"></div><button onClick={() => { deleteSet(ex.instanceId); setMenuOpenId(null); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-red-600 dark:text-red-400 font-medium text-sm transition-colors"><Icons.Trash2 className="w-4 h-4" /> {t.deleteSet}</button></div><div className="bg-gray-50 dark:bg-slate-700 p-2 text-center border-t border-gray-100 dark:border-slate-600"><button onClick={() => setMenuOpenId(null)} className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase">{t.cancel}</button></div>
+                                                    </Modal>
+                                                </div>
+                                            );
+                                        })}
+                                        <div className="flex justify-center pt-6"><button onClick={finishWorkout} className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900 text-red-600 dark:text-red-400 rounded-full font-bold shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Icons.Check className="w-5 h-5" /> {t.finishWorkout}</button></div>
+                                    </div>
+                                    <Modal isOpen={!!setMenuContext} onClose={() => setSetMenuContext(null)}><div className="bg-white dark:bg-slate-800"><div className="p-4 border-b border-gray-100 dark:border-slate-700"><h3 className="font-bold text-gray-900 dark:text-white">{t.sets}</h3></div><div className="p-2 space-y-1"><button onClick={() => { addSetAt(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.CornerDownRight className="w-4 h-4" /> {t.addSetBelow}</button><button onClick={() => { toggleSkipSet(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm">{setMenuContext?.skipped ? <Icons.Play className="w-4 h-4" /> : <Icons.SkipForward className="w-4 h-4" />} {setMenuContext?.skipped ? t.unskipSet : t.skipSet}</button><button onClick={() => { deleteSetAt(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-red-600 dark:text-red-400 font-medium text-sm"><Icons.Trash2 className="w-4 h-4" /> {t.deleteSet}</button></div><div className="border-t border-gray-100 dark:border-slate-700 p-2"><div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.setType}</div>{['regular', 'myorep', 'myorep_match', 'cluster', 'top', 'backoff'].map(type => (<button key={type} onClick={() => { changeSetType(setMenuContext.exId, setMenuContext.setId, type); setSetMenuContext(null); }} className={`w-full text-left px-4 py-2 flex items-center gap-3 text-sm rounded-lg ${setMenuContext?.type === type ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'}`}><div className={`w-3 h-3 rounded-full border ${setMenuContext?.type === type ? 'border-red-500 bg-red-500' : 'border-gray-400'}`}></div><div><div>{t.types[type]}</div><div className="text-[10px] font-normal opacity-70">{t.typeDesc[type]}</div></div></button>))}</div></div></Modal>
+                                </div>
+                            )}
+                        </div>
+                        {restTimer.active && (
+                            <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 p-4 pb-8 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-slideUp">
+                                <div className="max-w-md mx-auto">
+                                    <div className="flex justify-between items-center mb-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Icons.Clock className="w-4 h-4" /></div><div><div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.resting}</div><div className="text-xl font-black text-gray-800 dark:text-white font-mono leading-none">{formatSeconds(restTimer.timeLeft)}</div></div></div><div className="flex gap-1"><button onClick={() => setRestTimer(p => ({...p, timeLeft: p.timeLeft+10}))} className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 rounded text-xs font-bold text-gray-600 dark:text-gray-300 transition-colors">+10</button><button onClick={() => setRestTimer(p => ({...p, active: false}))} className="ml-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded text-xs font-bold transition-colors">SKIP</button></div></div>
+                                    <div className="h-1 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden"><div className="h-full bg-red-500 transition-all duration-1000 ease-linear" style={{ width: `${(restTimer.timeLeft / restTimer.duration) * 100}%` }}></div></div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
