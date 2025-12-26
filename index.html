@@ -39,7 +39,6 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
         
-        /* Custom Checkbox */
         .toggle-checkbox:checked { right: 0; border-color: #ef4444; }
         .toggle-checkbox:checked + .toggle-label { background-color: #ef4444; }
     </style>
@@ -106,17 +105,25 @@
             DownloadCloud: (p) => <Icon {...p} d={<><polyline points="8 17 12 21 16 17"/><line x1="12" x2="12" y1="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></>} />
         };
 
-        const MUSCLE_GROUPS = { CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS', ABS: 'ABS', FOREARMS: 'FOREARMS' };
+        // --- CONFIG Y DATOS ---
+        const MUSCLE_GROUPS = { 
+            CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', 
+            GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', 
+            BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS',
+            ABS: 'ABS', FOREARMS: 'FOREARMS'
+        };
+        
         const SUPERSET_COLORS = [{ border: 'border-orange-500', bg: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50' }, { border: 'border-purple-500', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50' }, { border: 'border-cyan-500', bg: 'bg-cyan-500', text: 'text-cyan-600', light: 'bg-cyan-50' }, { border: 'border-pink-500', bg: 'bg-pink-500', text: 'text-pink-600', light: 'bg-pink-50' }];
+        
         const TRANSLATIONS = {
             en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps", TRAPS: "Traps", ABS: "Abs", FOREARMS: "Forearms" },
             editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
             manageEx: "Manage Exercises", addEx: "Add New Exercise", exName: "Exercise Name", selectMuscle: "Select Muscle", deleteConfirm: "Delete this exercise?",
-            setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit", addExercise: "Add Exercise", updateTemplate: "Update Routine Template" },
+            setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit", addExercise: "Add Muscle Slot", updateTemplate: "Update Routine Template", selectMuscleToAdd: "Select Muscle to Add" },
             es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios", ABS: "Abdominales", FOREARMS: "Antebrazos" },
             editTemplate: "Editar Programa", resetTemplate: "Restaurar Defecto", editDay: "Editar Día", addDay: "Añadir Día", addSlot: "Añadir Slot", save: "Guardar", swapTitle: "Reemplazar Ejercicio", swapMsg: "¿Cómo quieres aplicar este cambio?", swapSession: "Solo esta Sesión", swapForever: "Actualizar Plan (Para siempre)", programEditor: "Editor de Programa", selectExBtn: "Elegir Ejercicio", any: "Cualquiera", reps: "Reps",
             manageEx: "Gestionar Ejercicios", addEx: "Añadir Nuevo Ejercicio", exName: "Nombre del Ejercicio", selectMuscle: "Seleccionar Músculo", deleteConfirm: "¿Borrar este ejercicio?",
-            setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso", addExercise: "Añadir Ejercicio", updateTemplate: "Actualizar Rutina Original" }
+            setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso", addExercise: "Añadir Slot Muscular", updateTemplate: "Actualizar Rutina Original", selectMuscleToAdd: "Elegir Músculo para el Slot" }
         };
 
         const DEFAULT_LIBRARY = [
@@ -168,6 +175,7 @@
             return (
                 <svg viewBox="0 0 200 400" className="w-24 h-48 mx-auto opacity-90">
                     <circle cx="100" cy="30" r="20" fill="#4b5563" />
+                    {/* Traps Polygon: Connecting neck to shoulder tips */}
                     <path d="M 100 50 L 130 60 L 120 70 L 80 70 L 70 60 Z" fill={getColor(MUSCLE_GROUPS.TRAPS)} />
                     <path d="M60 60 Q100 50 140 60 L130 90 L70 90 Z" fill={getColor(MUSCLE_GROUPS.SHOULDERS)} />
                     <path d="M70 90 L130 90 L125 130 L75 130 Z" fill={getColor(MUSCLE_GROUPS.CHEST)} />
@@ -205,11 +213,37 @@
             );
         };
 
+        const MuscleSelector = ({ onSelect, onCancel, t, tm }) => {
+            return (
+                 <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
+                    <div className="bg-white dark:bg-slate-800 px-4 py-4 border-b border-gray-200 dark:border-slate-700 flex items-center gap-3 shrink-0">
+                        <button onClick={onCancel} className="p-1 -ml-1 text-gray-400 hover:text-white"><Icons.ChevronLeft /></button>
+                        <div><div className="text-[10px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">{t.addExercise}</div><div className="text-lg font-bold text-gray-900 dark:text-white">{t.selectMuscleToAdd}</div></div>
+                    </div>
+                    <div className="flex-1 overflow-y-auto p-4 space-y-2 scroll-container pb-20">
+                         {Object.keys(MUSCLE_GROUPS).map(m => (
+                             <button key={m} onClick={() => onSelect(m)} className="w-full text-left p-4 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl shadow-sm hover:border-red-300 dark:hover:border-red-500 transition-all flex justify-between items-center group">
+                                <span className="font-bold text-gray-700 dark:text-gray-200 group-hover:text-red-600 dark:group-hover:text-red-400">{tm(m)}</span>
+                                <div className="w-2 h-2 rounded-full bg-red-500"></div>
+                            </button>
+                         ))}
+                    </div>
+                 </div>
+            );
+        };
+
         const ExerciseManager = ({ exercises, onSave, onCancel, onDelete, t, tm }) => {
             const [newExName, setNewExName] = useState("");
             const [newExMuscle, setNewExMuscle] = useState(MUSCLE_GROUPS.CHEST);
-            const handleAdd = () => { if(!newExName.trim()) return; onSave(newExName, newExMuscle); setNewExName(""); };
+            
+            const handleAdd = () => {
+                if(!newExName.trim()) return;
+                onSave(newExName, newExMuscle);
+                setNewExName("");
+            };
+
             const getExName = (ex) => typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
+
             return (
                 <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
                      <div className="bg-white dark:bg-slate-800 px-4 h-14 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between shrink-0">
@@ -310,7 +344,7 @@
             );
         };
 
-        const SummaryView = ({ data, onClose, t, onUpdateTemplate }) => {
+        const SummaryView = ({ data, onClose, t }) => {
             const [updateTemplate, setUpdateTemplate] = useState(false);
             const handleShare = () => {
                 const text = `IRONLOG WORKOUT\n${data.name}\n${Math.floor(data.duration/60)} min • ${data.totalVolume}kg Vol\n${data.totalSets} Sets • ${data.totalReps} Reps`;
@@ -416,14 +450,14 @@
             const [swapConfirmation, setSwapConfirmation] = useState(null);
             const [installPrompt, setInstallPrompt] = useState(null);
             const wakeLockRef = useRef(null);
-            const [addingExerciseToSession, setAddingExerciseToSession] = useState(false); // NEW STATE
+            const [addingExerciseToSession, setAddingExerciseToSession] = useState(false); 
+            const [sessionSelectionTarget, setSessionSelectionTarget] = useState(null);
 
             useEffect(() => { document.documentElement.className = theme; }, [theme]);
             useEffect(() => { let i; if(restTimer.active && restTimer.timeLeft > 0) i = setInterval(() => setRestTimer(p=>({...p, timeLeft:p.timeLeft-1})), 1000); else if(restTimer.timeLeft===0) setRestTimer(p=>({...p, active:false})); return () => clearInterval(i); }, [restTimer.active, restTimer.timeLeft]);
             useEffect(() => { let i; if(activeSession?.startTime) i = setInterval(() => setSessionElapsed(Math.floor((Date.now()-activeSession.startTime)/1000)), 1000); else setSessionElapsed(0); return () => clearInterval(i); }, [activeSession?.startTime]);
             useEffect(() => { const req = async () => { if ('wakeLock' in navigator && view === 'workout' && preventSleep) try { wakeLockRef.current = await navigator.wakeLock.request('screen'); } catch(e){} }; if(view==='workout' && preventSleep) { req(); document.addEventListener('visibilitychange', () => document.visibilityState==='visible'&&req()); } return () => { if(wakeLockRef.current) wakeLockRef.current.release(); }; }, [view, preventSleep]);
 
-            // History handling
             useEffect(() => {
                 if (!window.history.state) window.history.replaceState({ view: 'home' }, '');
                 const handlePopState = (event) => {
@@ -432,18 +466,18 @@
                     if (managingExercises) { setManagingExercises(false); return; }
                     if (editingTemplate) { if(confirm("¿Descartar cambios?")) setEditingTemplate(false); else window.history.pushState({ overlay: 'template' }, ''); return; }
                     if (selectionContext) { setSelectionContext(null); return; }
-                    if (addingExerciseToSession) { setAddingExerciseToSession(false); return; } // CLOSE ADD EX MODAL
+                    if (addingExerciseToSession) { setAddingExerciseToSession(false); return; }
+                    if (sessionSelectionTarget) { setSessionSelectionTarget(null); return; } 
                     if (summaryData) { closeSummary(); return; }
                     if (state && state.view) setView(state.view); else setView('home');
                 };
                 window.addEventListener('popstate', handlePopState);
                 return () => window.removeEventListener('popstate', handlePopState);
-            }, [showSettings, managingExercises, editingTemplate, selectionContext, summaryData, addingExerciseToSession]);
+            }, [showSettings, managingExercises, editingTemplate, selectionContext, summaryData, addingExerciseToSession, sessionSelectionTarget]);
 
             const navigate = (newView) => { setView(newView); window.history.pushState({ view: newView }, ''); };
             const openOverlay = (overlayName, setter) => { setter(true); window.history.pushState({ overlay: overlayName }, ''); };
 
-            // PWA Install
             useEffect(() => { const handler = (e) => { e.preventDefault(); setInstallPrompt(e); }; window.addEventListener('beforeinstallprompt', handler); return () => window.removeEventListener('beforeinstallprompt', handler); }, []);
             const handleInstall = async () => { if (!installPrompt) { alert("Para instalar en iOS: Pulsa Compartir y selecciona 'Añadir a pantalla de inicio'."); return; } installPrompt.prompt(); const { outcome } = await installPrompt.userChoice; if (outcome === 'accepted') setInstallPrompt(null); };
 
@@ -457,7 +491,7 @@
                 const newEx = { id: `custom_${Date.now()}`, name, muscle }; 
                 setExercises([...exercises, newEx]); 
                 if(selectionContext) handleExerciseSelect(newEx);
-                if(addingExerciseToSession) handleAddExerciseToSession(newEx); // NEW
+                if(sessionSelectionTarget) handleSessionExerciseSelect(newEx); 
             };
             const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
             const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
@@ -472,7 +506,7 @@
                 
                 const sessionExs = dayPlan.map((exId, idx) => { 
                     const exDef = exercises.find(e => e.id === exId) || exercises[0]; 
-                    const slotDef = program[dayIdx].slots[idx]; // Uses CURRENT program slot
+                    const slotDef = program[dayIdx].slots[idx]; 
                     const targetSets = slotDef.setTarget || 3; 
                     const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); 
                     return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; 
@@ -489,7 +523,7 @@
                 const { dayIdx, slotIdx } = context; 
                 const newExs = [...activeSession.exercises]; 
                 const prevEx = newExs[slotIdx]; 
-                newExs[slotIdx] = { ...exercise, slotLabel: prevEx.slotLabel, targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})), weightUnit: prevEx.weightUnit || 'kg' }; 
+                newExs[slotIdx] = { ...exercise, slotLabel: tm(exercise.muscle), targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})), weightUnit: prevEx.weightUnit || 'kg' }; 
                 setActiveSession({ ...activeSession, exercises: newExs }); 
                 
                 if (mode === 'forever') { 
@@ -505,18 +539,40 @@
                 setSwapConfirmation(null); 
             };
 
-            const handleAddExerciseToSession = (exercise) => {
+            const handleAddSlotToSession = (muscleGroup) => {
                 const newEx = {
-                    ...exercise,
-                    slotLabel: tm(exercise.muscle),
-                    targetReps: '',
-                    instanceId: Date.now() + Math.random(),
-                    note: '',
+                    id: null, 
+                    instanceId: Date.now(),
+                    muscle: muscleGroup,
+                    name: "Seleccionar Ejercicio",
+                    slotLabel: tm(muscleGroup),
                     sets: [{ id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }],
-                    weightUnit: 'kg'
+                    weightUnit: 'kg',
+                    isPlaceholder: true
                 };
                 setActiveSession(prev => ({ ...prev, exercises: [...prev.exercises, newEx] }));
                 setAddingExerciseToSession(false);
+            };
+
+            const handleSessionExerciseSelect = (exercise) => {
+                if (!sessionSelectionTarget) return;
+                setActiveSession(prev => ({
+                    ...prev,
+                    exercises: prev.exercises.map(ex => {
+                        if (ex.instanceId === sessionSelectionTarget) {
+                            return {
+                                ...exercise,
+                                instanceId: ex.instanceId,
+                                slotLabel: ex.slotLabel,
+                                sets: ex.sets,
+                                weightUnit: ex.weightUnit,
+                                targetReps: ''
+                            };
+                        }
+                        return ex;
+                    })
+                }));
+                setSessionSelectionTarget(null);
             };
 
             const toggleSet = (exId, setId) => { const ex = activeSession.exercises.find(e => e.instanceId === exId); const set = ex.sets.find(s => s.id === setId); if(set.skipped) return; const completing = !set.completed; let start = activeSession.startTime; if(completing && !start) start = Date.now(); setActiveSession(p => ({...p, startTime: start, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? { ...s, completed: completing } : s)} : e)})); if(completing) setRestTimer({ active: true, timeLeft: 120, duration: 120 }); };
@@ -570,9 +626,9 @@
             const exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ activeMeso, activeSession, exercises, logs, program })); const da = document.createElement('a'); da.setAttribute("href", dataStr); da.setAttribute("download", "ironlog_backup.json"); document.body.appendChild(da); da.click(); da.remove(); };
             const importData = (e) => { const fr = new FileReader(); fr.readAsText(e.target.files[0], "UTF-8"); fr.onload = ev => { if(confirm(t.importConfirm)) { const p = JSON.parse(ev.target.result); setActiveMeso(p.activeMeso); setActiveSession(p.activeSession); setExercises(p.exercises); setLogs(p.logs); if(p.program) setProgram(p.program); alert(t.dataSaved); } }; };
             const getVolumeStatus = (sets) => { if (sets < 6) return { label: t.volumeStatus.low, color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-slate-700' }; if (sets < 10) return { label: t.volumeStatus.maintenance, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' }; if (sets <= 20) return { label: t.volumeStatus.optimal, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' }; return { label: t.volumeStatus.high, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }; };
-            const weeklyVolumeData = useMemo(() => { if (!activeMeso || logs.length === 0) return { week: 1, data: {} }; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); const currentWeekLogs = mesoLogs.filter(l => l.week === activeMeso.week); let targetWeek = activeMeso.week; let targetLogs = currentWeekLogs; if (currentWeekLogs.length === 0 && activeMeso.week > 1) { targetWeek = activeMeso.week - 1; targetLogs = mesoLogs.filter(l => l.week === targetWeek); } const vol = {}; targetLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) vol[ex.muscle] = (vol[ex.muscle] || 0) + sets; }); }); return { week: targetWeek, data: vol }; }, [logs, activeMeso]);
-            const mesoAverageVolume = useMemo(() => { if (!activeMeso || logs.length === 0) return {}; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); if (mesoLogs.length === 0) return {}; const weeks = new Set(mesoLogs.map(l => l.week)).size || 1; const totalVol = {}; mesoLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) totalVol[ex.muscle] = (totalVol[ex.muscle] || 0) + sets; }); }); const avgVol = {}; Object.keys(totalVol).forEach(m => { avgVol[m] = Math.round((totalVol[m] / weeks) * 10) / 10; }); return avgVol; }, [logs, activeMeso]);
-            const mesoStats = useMemo(() => activeMeso ? { totalWorkouts: logs.filter(l => l.mesoId === activeMeso.id && !l.skipped).length } : null, [logs, activeMeso]);
+            const weeklyVolumeData = useMemo(() => { if (!activeMeso || !logs || logs.length === 0) return { week: 1, data: {} }; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); const currentWeekLogs = mesoLogs.filter(l => l.week === activeMeso.week); let targetWeek = activeMeso.week; let targetLogs = currentWeekLogs; if (currentWeekLogs.length === 0 && activeMeso.week > 1) { targetWeek = activeMeso.week - 1; targetLogs = mesoLogs.filter(l => l.week === targetWeek); } const vol = {}; targetLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) vol[ex.muscle] = (vol[ex.muscle] || 0) + sets; }); }); return { week: targetWeek, data: vol }; }, [logs, activeMeso]);
+            const mesoAverageVolume = useMemo(() => { if (!activeMeso || !logs || logs.length === 0) return {}; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); if (mesoLogs.length === 0) return {}; const weeks = new Set(mesoLogs.map(l => l.week)).size || 1; const totalVol = {}; mesoLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) totalVol[ex.muscle] = (totalVol[ex.muscle] || 0) + sets; }); }); const avgVol = {}; Object.keys(totalVol).forEach(m => { avgVol[m] = Math.round((totalVol[m] / weeks) * 10) / 10; }); return avgVol; }, [logs, activeMeso]);
+            const mesoStats = useMemo(() => activeMeso && logs ? { totalWorkouts: logs.filter(l => l.mesoId === activeMeso.id && !l.skipped).length } : null, [logs, activeMeso]);
 
             return (
                 <div className={`w-full h-full flex flex-col ${theme}`}>
@@ -614,9 +670,21 @@
                         {selectionContext && <ExerciseSelector muscleFilter={selectionContext.muscle} slotLabel={tm(selectionContext.muscle)} exercises={exercises} onSelect={handleExerciseSelect} onCancel={() => setSelectionContext(null)} onCreate={createExercise} t={t} tm={tm} />}
                         {editingTemplate && <TemplateEditor program={program} exercises={exercises} onSave={(p) => { setProgram(p); setEditingTemplate(false); }} onCancel={() => setEditingTemplate(false)} t={t} tm={tm} onCreateExercise={handleTemplateCreateExercise} />}
                         {managingExercises && <ExerciseManager exercises={exercises} onSave={manualCreateExercise} onDelete={deleteCustomExercise} onCancel={() => setManagingExercises(false)} t={t} tm={tm} />}
-                        {addingExerciseToSession && <ExerciseSelector muscleFilter={null} slotLabel={t.addExercise} exercises={exercises} onSelect={handleAddExerciseToSession} onCancel={() => setAddingExerciseToSession(false)} onCreate={createExercise} t={t} tm={tm} />}
+                        {addingExerciseToSession && <MuscleSelector onSelect={handleAddSlotToSession} onCancel={() => setAddingExerciseToSession(false)} t={t} tm={tm} />}
+                        {sessionSelectionTarget && (
+                            <ExerciseSelector 
+                                muscleFilter={activeSession.exercises.find(e => e.instanceId === sessionSelectionTarget)?.muscle} 
+                                slotLabel={activeSession.exercises.find(e => e.instanceId === sessionSelectionTarget)?.slotLabel} 
+                                exercises={exercises} 
+                                onSelect={handleSessionExerciseSelect} 
+                                onCancel={() => setSessionSelectionTarget(null)} 
+                                onCreate={createExercise} 
+                                t={t} 
+                                tm={tm} 
+                            />
+                        )}
                         {swapConfirmation && <SwapConfirmationModal isOpen={!!swapConfirmation} onClose={() => setSwapConfirmation(null)} onSessionOnly={() => confirmSwap('session')} onForever={() => confirmSwap('forever')} t={t} exerciseName={getExName(swapConfirmation?.exercise)} />}
-                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} onUpdateTemplate={setUpdateTemplate} />}
+                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} />}
 
                         {/* HEADER & NAV */}
                         {view !== 'workout' && (
@@ -653,6 +721,41 @@
                                             </div>
                                         );
                                     })}</div>}
+                                </div>
+                            )}
+                            {view === 'history' && (
+                                <div className="p-4 space-y-6">
+                                    {activeMeso && <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex justify-between"><div><div className="text-xs font-bold text-gray-400 uppercase">{t.mesoStats}</div><div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{mesoStats?.totalWorkouts||0}</div><div className="text-xs text-gray-500">{t.totalWorkouts}</div></div><div className="text-right"><div className="text-xs font-bold text-gray-400 uppercase">{t.currentWeek}</div><div className="text-2xl font-black text-red-600 font-mono">{activeMeso.week}</div></div></div>}
+                                    
+                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <div className="flex items-center gap-2 mb-4"><Icons.BarChart2 className="w-5 h-5 text-red-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.volume} ({t.week} {weeklyVolumeData.week})</h3></div>
+                                        {Object.keys(weeklyVolumeData.data).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
+                                            <div className="space-y-4">{Object.entries(weeklyVolumeData.data).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => {
+                                                const status = getVolumeStatus(sets);
+                                                return (
+                                                    <div key={muscle}>
+                                                        <div className="flex justify-between items-end mb-1">
+                                                            <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">{tm(muscle)}</span>
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${status.bg} ${status.color}`}>{status.label}</span>
+                                                                <span className="text-xs font-bold text-gray-900 dark:text-white">{sets} {t.sets}</span>
+                                                            </div>
+                                                        </div>
+                                                        <ProgressBar value={sets} max={25} />
+                                                    </div>
+                                                );
+                                            })}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                                        <div className="flex items-center gap-2 mb-4"><Icons.Activity className="w-5 h-5 text-blue-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.mesoAvg}</h3></div>
+                                        {Object.keys(mesoAverageVolume).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
+                                            <div className="space-y-3">{Object.entries(mesoAverageVolume).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => (<div key={muscle}><div className="flex justify-between text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1"><span>{tm(muscle)}</span><span>{sets} {t.sets} / {t.week}</span></div><ProgressBar value={sets} max={20} colorClass="bg-blue-500" /></div>))}</div>
+                                        )}
+                                    </div>
+
+                                    <div className="space-y-2">{logs.map(log => (<div key={log.id} className={`p-3 rounded-lg border flex justify-between items-center ${log.skipped?'bg-gray-100 dark:bg-slate-800/50':'bg-white dark:bg-slate-800 shadow-sm border-gray-200 dark:border-slate-700'}`}><div><div className={`font-bold text-sm ${log.skipped?'text-gray-400 line-through':'text-gray-900 dark:text-gray-100'}`}>{log.name}</div><div className="text-xs text-gray-500">{formatDate(log.endTime, lang)}</div></div>{log.skipped ? <span className="text-[10px] font-bold bg-gray-200 text-gray-500 px-2 py-1 rounded">{t.skipped}</span> : <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded">{Math.floor(log.duration/60)}m</span>}</div>))}</div>
                                 </div>
                             )}
                             {view === 'workout' && activeSession && (
