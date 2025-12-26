@@ -275,7 +275,13 @@
             const updateDayName = (dayIdx, val) => { const n = [...localProgram]; n[dayIdx].dayName[t.lang === 'es'?'es':'en'] = val; setLocalProgram(n); };
             const updateSlotMuscle = (dayIdx, slotIdx, muscle) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].muscle = muscle; n[dayIdx].slots[slotIdx].exerciseId = null; setLocalProgram(n); };
             const updateSlotReps = (dayIdx, slotIdx, reps) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].reps = reps; setLocalProgram(n); };
-            const updateSlotSets = (dayIdx, slotIdx, sets) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].setTarget = Number(sets); setLocalProgram(n); };
+            
+            // FIX: Allow empty string for better editing experience
+            const updateSlotSets = (dayIdx, slotIdx, sets) => { 
+                const n = [...localProgram]; 
+                n[dayIdx].slots[slotIdx].setTarget = sets === '' ? '' : Number(sets); 
+                setLocalProgram(n); 
+            };
             
             const handleExSelect = (ex) => {
                 const { dayIdx, slotIdx } = exSelector;
@@ -333,7 +339,8 @@
                                                  <input 
                                                     type="number"
                                                     placeholder={t.setsCount}
-                                                    value={slot.setTarget || 3} 
+                                                    // FIX: Remove default value OR here to allow clearing
+                                                    value={slot.setTarget === undefined ? 3 : slot.setTarget} 
                                                     onChange={e => updateSlotSets(dIdx, sIdx, e.target.value)}
                                                     className="w-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
                                                  />
@@ -470,6 +477,66 @@
             useEffect(() => { let i; if(activeSession?.startTime) i = setInterval(() => setSessionElapsed(Math.floor((Date.now()-activeSession.startTime)/1000)), 1000); else setSessionElapsed(0); return () => clearInterval(i); }, [activeSession?.startTime]);
             useEffect(() => { const req = async () => { if ('wakeLock' in navigator && view === 'workout' && preventSleep) try { wakeLockRef.current = await navigator.wakeLock.request('screen'); } catch(e){} }; if(view==='workout' && preventSleep) { req(); document.addEventListener('visibilitychange', () => document.visibilityState==='visible'&&req()); } return () => { if(wakeLockRef.current) wakeLockRef.current.release(); }; }, [view, preventSleep]);
 
+            // --- HISTORY HANDLING (BACK BUTTON) ---
+            useEffect(() => {
+                // Initialize history
+                if (!window.history.state) {
+                    window.history.replaceState({ view: 'home' }, '');
+                }
+
+                const handlePopState = (event) => {
+                    const state = event.state;
+                    
+                    // Priority: Close Overlays first
+                    if (showSettings) {
+                        setShowSettings(false);
+                        return;
+                    }
+                    if (managingExercises) {
+                        setManagingExercises(false);
+                        return;
+                    }
+                    if (editingTemplate) {
+                        if(confirm("¿Descartar cambios?")) {
+                             setEditingTemplate(false);
+                        } else {
+                             // Push state back to prevent exit if user cancels
+                             window.history.pushState({ overlay: 'template' }, ''); 
+                        }
+                        return;
+                    }
+                    if (selectionContext) {
+                        setSelectionContext(null);
+                        return;
+                    }
+                    if (summaryData) {
+                        closeSummary();
+                        return;
+                    }
+
+                    // View Navigation
+                    if (state && state.view) {
+                        setView(state.view);
+                    } else {
+                        // Fallback
+                        setView('home');
+                    }
+                };
+
+                window.addEventListener('popstate', handlePopState);
+                return () => window.removeEventListener('popstate', handlePopState);
+            }, [showSettings, managingExercises, editingTemplate, selectionContext, summaryData]);
+
+            const navigate = (newView) => {
+                setView(newView);
+                window.history.pushState({ view: newView }, '');
+            };
+
+            const openOverlay = (overlayName, setter) => {
+                setter(true);
+                window.history.pushState({ overlay: overlayName }, '');
+            };
+
             // PWA Install Logic
             useEffect(() => {
                 const handler = (e) => {
@@ -500,7 +567,21 @@
             const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
             const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
             const checkWeekCompletion = (currentMeso, currentLogs) => { if (!currentMeso) return; const weekLogs = currentLogs.filter(l => l.mesoId === currentMeso.id && l.week === currentMeso.week); if (program.every((_, d) => weekLogs.some(l => l.dayIdx === d))) setTimeout(() => setActiveMeso(p => ({ ...p, week: p.week + 1 })), 1000); };
-            const startSession = (dayIdx) => { const dayPlan = activeMeso.plan[dayIdx]; if (!dayPlan) return; const firstEmptyIdx = dayPlan.findIndex(s => s === null); if (firstEmptyIdx !== -1) { const slotDef = program[dayIdx].slots[firstEmptyIdx]; setSelectionContext({ dayIdx, slotIdx: firstEmptyIdx, muscle: slotDef.muscle, label: tm(slotDef.muscle) }); return; } if (activeSession && activeSession.dayIdx === dayIdx) { setView('workout'); return; } const sessionExs = dayPlan.map((exId, idx) => { const exDef = exercises.find(e => e.id === exId) || exercises[0]; const slotDef = program[dayIdx].slots[idx]; const targetSets = slotDef.setTarget || 3; const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; }); setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); setView('workout'); };
+            
+            const startSession = (dayIdx) => { 
+                const dayPlan = activeMeso.plan[dayIdx]; 
+                if (!dayPlan) return; 
+                const firstEmptyIdx = dayPlan.findIndex(s => s === null); 
+                if (firstEmptyIdx !== -1) { 
+                    const slotDef = program[dayIdx].slots[firstEmptyIdx]; 
+                    setSelectionContext({ dayIdx, slotIdx: firstEmptyIdx, muscle: slotDef.muscle, label: tm(slotDef.muscle) }); 
+                    window.history.pushState({ overlay: 'selection' }, '');
+                    return; 
+                } 
+                if (activeSession && activeSession.dayIdx === dayIdx) { navigate('workout'); return; } 
+                const sessionExs = dayPlan.map((exId, idx) => { const exDef = exercises.find(e => e.id === exId) || exercises[0]; const slotDef = program[dayIdx].slots[idx]; const targetSets = slotDef.setTarget || 3; const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; }); setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); navigate('workout'); 
+            };
+            
             const skipSession = (dayIdx) => { const log = { id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, startTime: Date.now(), endTime: Date.now(), duration: 0, skipped: true, exercises: [], mesoId: activeMeso.id, week: activeMeso.week }; const newLogs = [log, ...logs]; setLogs(newLogs); setDayMenuOpenIdx(null); checkWeekCompletion(activeMeso, newLogs); };
             const handleExerciseSelect = (exercise) => { if (!selectionContext) return; const { dayIdx, slotIdx } = selectionContext; if (activeSession && activeSession.dayIdx === dayIdx) { setSwapConfirmation({ exercise, context: selectionContext }); setSelectionContext(null); return; } const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); setSelectionContext(null); setTimeout(() => startSession(dayIdx), 50); };
             const confirmSwap = (mode) => { if (!swapConfirmation) return; const { exercise, context } = swapConfirmation; const { dayIdx, slotIdx } = context; const newExs = [...activeSession.exercises]; const prevEx = newExs[slotIdx]; newExs[slotIdx] = { ...exercise, slotLabel: prevEx.slotLabel, targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})), weightUnit: prevEx.weightUnit || 'kg' }; setActiveSession({ ...activeSession, exercises: newExs }); if (mode === 'forever') { const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); } setSwapConfirmation(null); };
@@ -521,7 +602,7 @@
             const getSupersetColor = (ssid) => { if(!activeSession) return SUPERSET_COLORS[0]; const u = [...new Set(activeSession.exercises.map(e=>e.supersetId).filter(Boolean))]; return SUPERSET_COLORS[u.indexOf(ssid) % SUPERSET_COLORS.length]; };
             const toggleUnit = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, weightUnit: e.weightUnit === 'pl' ? 'kg' : 'pl'} : e)}));
             const finishWorkout = () => { const duration = activeSession.startTime ? (Date.now() - activeSession.startTime)/1000 : 0; let vol=0, sets=0, reps=0, muscles=[]; activeSession.exercises.forEach(ex => { let worked=false; ex.sets.forEach(s => { if(s.completed) { vol += (Number(s.weight)||0)*(Number(s.reps)||0); sets++; reps+=(Number(s.reps)||0); worked=true; } }); if(worked) muscles.push(ex.muscle); }); setSummaryData({ name: activeSession.name, duration, totalVolume: vol, totalSets: sets, totalReps: reps, workedMuscles: [...new Set(muscles)], sessionData: { ...activeSession, endTime: Date.now(), duration } }); };
-            const closeSummary = () => { const log = summaryData.sessionData; const newLogs = [log, ...logs]; setLogs(newLogs); setActiveSession(null); setRestTimer({active:false}); setSummaryData(null); setView('home'); checkWeekCompletion(activeMeso, newLogs); };
+            const closeSummary = () => { const log = summaryData.sessionData; const newLogs = [log, ...logs]; setLogs(newLogs); setActiveSession(null); setRestTimer({active:false}); setSummaryData(null); navigate('home'); checkWeekCompletion(activeMeso, newLogs); };
             const exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ activeMeso, activeSession, exercises, logs, program })); const da = document.createElement('a'); da.setAttribute("href", dataStr); da.setAttribute("download", "ironlog_backup.json"); document.body.appendChild(da); da.click(); da.remove(); };
             const importData = (e) => { const fr = new FileReader(); fr.readAsText(e.target.files[0], "UTF-8"); fr.onload = ev => { if(confirm(t.importConfirm)) { const p = JSON.parse(ev.target.result); setActiveMeso(p.activeMeso); setActiveSession(p.activeSession); setExercises(p.exercises); setLogs(p.logs); if(p.program) setProgram(p.program); alert(t.dataSaved); } }; };
             const getVolumeStatus = (sets) => { if (sets < 6) return { label: t.volumeStatus.low, color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-slate-700' }; if (sets < 10) return { label: t.volumeStatus.maintenance, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' }; if (sets <= 20) return { label: t.volumeStatus.optimal, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' }; return { label: t.volumeStatus.high, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }; };
@@ -550,10 +631,10 @@
                                     <button onClick={() => setShowRIR(!showRIR)} className={`w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors ${!showRIR ? 'opacity-70' : ''}`}>
                                         {showRIR ? <Icons.Eye className="w-4 h-4" /> : <Icons.EyeOff className="w-4 h-4" />} {t.showRIR}
                                     </button>
-                                    <button onClick={() => { setShowSettings(false); setManagingExercises(true); }} className="w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors">
+                                    <button onClick={() => { setShowSettings(false); openOverlay('exercises', setManagingExercises); }} className="w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors">
                                         <Icons.Dumbbell className="w-4 h-4" /> {t.manageEx}
                                     </button>
-                                    <button onClick={() => { setShowSettings(false); setEditingTemplate(true); }} className="w-full py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-indigo-100 dark:border-indigo-900/30">
+                                    <button onClick={() => { setShowSettings(false); openOverlay('template', setEditingTemplate); }} className="w-full py-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-indigo-100 dark:border-indigo-900/30">
                                         <Icons.Layout className="w-4 h-4" /> {t.editTemplate}
                                     </button>
                                     <button onClick={() => { if(confirm("Reset template?")) setProgram(DEFAULT_TEMPLATE); }} className="mt-2 w-full py-2 text-xs font-bold text-gray-400 uppercase hover:text-red-500">{t.resetTemplate}</button>
@@ -575,8 +656,8 @@
                         {/* HEADER & NAV */}
                         {view !== 'workout' && (
                             <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shrink-0">
-                                <div className="px-4 h-14 flex items-center justify-between"><RPIcon /><button onClick={() => setShowSettings(true)}><Icons.Menu className="w-6 h-6 text-gray-400" /></button></div>
-                                <div className="flex border-t border-gray-100 dark:border-slate-700"><button onClick={() => setView('home')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'home' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.active}</button><button onClick={() => setView('history')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'history' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.history}</button></div>
+                                <div className="px-4 h-14 flex items-center justify-between"><RPIcon /><button onClick={() => openOverlay('settings', setShowSettings)}><Icons.Menu className="w-6 h-6 text-gray-400" /></button></div>
+                                <div className="flex border-t border-gray-100 dark:border-slate-700"><button onClick={() => navigate('home')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'home' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.active}</button><button onClick={() => navigate('history')} className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider ${view === 'history' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-400 dark:text-gray-500'}`}>{t.history}</button></div>
                             </div>
                         )}
 
@@ -646,7 +727,7 @@
                             )}
                             {view === 'workout' && activeSession && (
                                 <div className="bg-[#FAFAFA] dark:bg-slate-900 min-h-screen pb-32">
-                                    <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shadow-sm px-4 h-14 flex items-center justify-between"><button onClick={() => setView('home')} className="text-gray-400 flex items-center gap-1 text-xs font-bold uppercase"><Icons.ChevronLeft className="w-4 h-4" /> {t.back}</button><div className="text-center"><div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.massPhase}</div><div className="text-sm font-bold text-gray-900 dark:text-white">{activeSession.name}</div></div><div className="flex items-center gap-2"><div className="bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded font-mono text-xs font-bold text-gray-600 dark:text-gray-300 min-w-[48px] text-center">{formatSeconds(sessionElapsed)}</div><button onClick={() => setPreventSleep(!preventSleep)} className={`p-1.5 rounded-full ${preventSleep ? 'bg-yellow-100 text-yellow-600' : 'text-gray-400'}`}><Icons.Zap className={`w-4 h-4 ${preventSleep ? 'fill-current' : ''}`} /></button><button onClick={finishWorkout} className="text-red-600 font-bold text-xs uppercase">{t.finishWorkout}</button></div></div>
+                                    <div className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-20 shadow-sm px-4 h-14 flex items-center justify-between"><button onClick={() => { if(confirm(t.finishConfirm)) navigate('home'); }} className="text-gray-400 flex items-center gap-1 text-xs font-bold uppercase"><Icons.ChevronLeft className="w-4 h-4" /> {t.back}</button><div className="text-center"><div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">{t.massPhase}</div><div className="text-sm font-bold text-gray-900 dark:text-white">{activeSession.name}</div></div><div className="flex items-center gap-2"><div className="bg-gray-100 dark:bg-slate-700 px-2 py-1 rounded font-mono text-xs font-bold text-gray-600 dark:text-gray-300 min-w-[48px] text-center">{formatSeconds(sessionElapsed)}</div><button onClick={() => setPreventSleep(!preventSleep)} className={`p-1.5 rounded-full ${preventSleep ? 'bg-yellow-100 text-yellow-600' : 'text-gray-400'}`}><Icons.Zap className={`w-4 h-4 ${preventSleep ? 'fill-current' : ''}`} /></button><button onClick={finishWorkout} className="text-red-600 font-bold text-xs uppercase">{t.finishWorkout}</button></div></div>
                                     <div className="p-2 sm:p-4 space-y-4">
                                         {linkingMode && <div className="bg-blue-600 text-white p-3 rounded-lg text-sm font-bold flex justify-between items-center sticky top-16 z-30 shadow-lg"><span>{t.selectToLink}</span><button onClick={() => setLinkingMode(null)} className="bg-white/20 p-1 rounded"><Icons.X className="w-4 h-4" /></button></div>}
                                         {activeSession.exercises.map((ex) => {
