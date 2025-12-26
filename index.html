@@ -121,17 +121,18 @@
         const MUSCLE_GROUPS = { 
             CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', 
             GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', 
-            BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS' 
+            BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS',
+            ABS: 'ABS', FOREARMS: 'FOREARMS'
         };
         
         const SUPERSET_COLORS = [{ border: 'border-orange-500', bg: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50' }, { border: 'border-purple-500', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50' }, { border: 'border-cyan-500', bg: 'bg-cyan-500', text: 'text-cyan-600', light: 'bg-cyan-50' }, { border: 'border-pink-500', bg: 'bg-pink-500', text: 'text-pink-600', light: 'bg-pink-50' }];
         
         const TRANSLATIONS = {
-            en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps", TRAPS: "Traps" },
+            en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps", TRAPS: "Traps", ABS: "Abs", FOREARMS: "Forearms" },
             editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
             manageEx: "Manage Exercises", addEx: "Add New Exercise", exName: "Exercise Name", selectMuscle: "Select Muscle", deleteConfirm: "Delete this exercise?",
             setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit" },
-            es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios" },
+            es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios", ABS: "Abdominales", FOREARMS: "Antebrazos" },
             editTemplate: "Editar Programa", resetTemplate: "Restaurar Defecto", editDay: "Editar Día", addDay: "Añadir Día", addSlot: "Añadir Slot", save: "Guardar", swapTitle: "Reemplazar Ejercicio", swapMsg: "¿Cómo quieres aplicar este cambio?", swapSession: "Solo esta Sesión", swapForever: "Actualizar Plan (Para siempre)", programEditor: "Editor de Programa", selectExBtn: "Elegir Ejercicio", any: "Cualquiera", reps: "Reps",
             manageEx: "Gestionar Ejercicios", addEx: "Añadir Nuevo Ejercicio", exName: "Nombre del Ejercicio", selectMuscle: "Seleccionar Músculo", deleteConfirm: "¿Borrar este ejercicio?",
             setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso" }
@@ -160,7 +161,9 @@
             { id: 'curl_ez', name: { en: 'EZ Bar Curl', es: 'Curl Barra EZ' }, muscle: MUSCLE_GROUPS.BICEPS },
             { id: 'curl_db', name: { en: 'Dumbbell Curl', es: 'Curl con Mancuernas' }, muscle: MUSCLE_GROUPS.BICEPS },
             { id: 'tri_push', name: { en: 'Tricep Pushdown', es: 'Extensión Tríceps Polea' }, muscle: MUSCLE_GROUPS.TRICEPS },
-            { id: 'tri_ext', name: { en: 'Overhead Extension', es: 'Extensión sobre Cabeza' }, muscle: MUSCLE_GROUPS.TRICEPS }
+            { id: 'tri_ext', name: { en: 'Overhead Extension', es: 'Extensión sobre Cabeza' }, muscle: MUSCLE_GROUPS.TRICEPS },
+            { id: 'abs_cable', name: { en: 'Cable Crunch', es: 'Crunch en Polea' }, muscle: MUSCLE_GROUPS.ABS },
+            { id: 'wrist_curl', name: { en: 'Wrist Curl', es: 'Curl de Muñeca' }, muscle: MUSCLE_GROUPS.FOREARMS }
         ];
         
         const DEFAULT_TEMPLATE = [ 
@@ -184,12 +187,18 @@
             return (
                 <svg viewBox="0 0 200 400" className="w-24 h-48 mx-auto opacity-90">
                     <circle cx="100" cy="30" r="20" fill="#4b5563" />
-                    {/* Traps Polygon: Connecting neck to shoulder tips */}
+                    {/* Traps Polygon */}
                     <path d="M 100 50 L 130 60 L 120 70 L 80 70 L 70 60 Z" fill={getColor(MUSCLE_GROUPS.TRAPS)} />
                     <path d="M60 60 Q100 50 140 60 L130 90 L70 90 Z" fill={getColor(MUSCLE_GROUPS.SHOULDERS)} />
                     <path d="M70 90 L130 90 L125 130 L75 130 Z" fill={getColor(MUSCLE_GROUPS.CHEST)} />
+                    {/* ABS */}
+                    <rect x="85" y="140" width="30" height="40" rx="2" fill={getColor(MUSCLE_GROUPS.ABS)} />
                     <rect x="40" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.BICEPS)} />
                     <rect x="140" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.TRICEPS)} />
+                    {/* FOREARMS */}
+                    <rect x="35" y="130" width="15" height="40" rx="5" fill={getColor(MUSCLE_GROUPS.FOREARMS)} />
+                    <rect x="150" y="130" width="15" height="40" rx="5" fill={getColor(MUSCLE_GROUPS.FOREARMS)} />
+                    
                     <path d="M75 130 L125 130 L120 180 L80 180 Z" fill={getColor(MUSCLE_GROUPS.BACK)} />
                     <path d="M80 180 L120 180 L130 280 L110 280 L100 200 L90 280 L70 280 Z" fill={getColor(MUSCLE_GROUPS.QUADS)} />
                     <rect x="70" y="285" width="20" height="50" rx="5" fill={getColor(MUSCLE_GROUPS.CALVES)} />
@@ -197,9 +206,6 @@
                 </svg>
             );
         };
-
-        // ... [Icon Definitions and other components remain the same] ...
-        // ... (Adding swap confirmation and others) ...
 
         const SwapConfirmationModal = ({ isOpen, onClose, onSessionOnly, onForever, t, exerciseName }) => {
             if (!isOpen) return null;
@@ -268,7 +274,7 @@
             );
         };
 
-        const TemplateEditor = ({ program, exercises, onSave, onCancel, t, tm }) => {
+        const TemplateEditor = ({ program, exercises, onSave, onCancel, t, tm, onCreateExercise }) => {
             const [localProgram, setLocalProgram] = useState(JSON.parse(JSON.stringify(program)));
             const [exSelector, setExSelector] = useState(null); 
 
@@ -276,7 +282,6 @@
             const updateSlotMuscle = (dayIdx, slotIdx, muscle) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].muscle = muscle; n[dayIdx].slots[slotIdx].exerciseId = null; setLocalProgram(n); };
             const updateSlotReps = (dayIdx, slotIdx, reps) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].reps = reps; setLocalProgram(n); };
             
-            // FIX: Allow empty string for better editing experience
             const updateSlotSets = (dayIdx, slotIdx, sets) => { 
                 const n = [...localProgram]; 
                 n[dayIdx].slots[slotIdx].setTarget = sets === '' ? '' : Number(sets); 
@@ -339,7 +344,6 @@
                                                  <input 
                                                     type="number"
                                                     placeholder={t.setsCount}
-                                                    // FIX: Remove default value OR here to allow clearing
                                                     value={slot.setTarget === undefined ? 3 : slot.setTarget} 
                                                     onChange={e => updateSlotSets(dIdx, sIdx, e.target.value)}
                                                     className="w-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
@@ -360,7 +364,10 @@
                             exercises={exercises} 
                             onSelect={handleExSelect} 
                             onCancel={() => setExSelector(null)} 
-                            onCreate={() => {}} 
+                            onCreate={(name, muscle) => {
+                                const newEx = onCreateExercise(name, muscle);
+                                handleExSelect(newEx);
+                            }} 
                             t={t}
                             tm={tm}
                         />
@@ -563,6 +570,13 @@
             };
 
             const startMesocycle = () => { const initialPlan = program.map(day => day.slots.map(slot => slot.exerciseId || null)); setActiveMeso({ id: Date.now(), week: 1, plan: initialPlan }); };
+            
+            const handleTemplateCreateExercise = (name, muscle) => {
+                const newEx = { id: `custom_${Date.now()}`, name, muscle };
+                setExercises(prev => [...prev, newEx]);
+                return newEx;
+            };
+
             const createExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); if(selectionContext) handleExerciseSelect(newEx); };
             const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
             const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
@@ -648,7 +662,7 @@
                         {showSettings && <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setShowSettings(false)}></div>}
                         
                         {selectionContext && <ExerciseSelector muscleFilter={selectionContext.muscle} slotLabel={tm(selectionContext.muscle)} exercises={exercises} onSelect={handleExerciseSelect} onCancel={() => setSelectionContext(null)} onCreate={createExercise} t={t} tm={tm} />}
-                        {editingTemplate && <TemplateEditor program={program} exercises={exercises} onSave={(p) => { setProgram(p); setEditingTemplate(false); }} onCancel={() => setEditingTemplate(false)} t={t} tm={tm} />}
+                        {editingTemplate && <TemplateEditor program={program} exercises={exercises} onSave={(p) => { setProgram(p); setEditingTemplate(false); }} onCancel={() => setEditingTemplate(false)} t={t} tm={tm} onCreateExercise={handleTemplateCreateExercise} />}
                         {managingExercises && <ExerciseManager exercises={exercises} onSave={manualCreateExercise} onDelete={deleteCustomExercise} onCancel={() => setManagingExercises(false)} t={t} tm={tm} />}
                         {swapConfirmation && <SwapConfirmationModal isOpen={!!swapConfirmation} onClose={() => setSwapConfirmation(null)} onSessionOnly={() => confirmSwap('session')} onForever={() => confirmSwap('forever')} t={t} exerciseName={getExName(swapConfirmation?.exercise)} />}
                         {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} />}
