@@ -38,29 +38,20 @@
         .animate-slideUp { animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        
+        /* Custom Checkbox */
+        .toggle-checkbox:checked { right: 0; border-color: #ef4444; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #ef4444; }
     </style>
 
     <!-- PWA INJECTION SCRIPT -->
     <script>
         (function() {
-            // Generar Icono SVG Base64
             const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="120" fill="#0f172a"/><path d="M166 160h180v40h-40v112h40v40H166v-40h40V200h-40v-40z" fill="#ef4444"/><rect x="116" y="160" width="30" height="192" rx="8" fill="#475569"/><rect x="366" y="160" width="30" height="192" rx="8" fill="#475569"/><path d="M256 120l-30-30h60z" fill="#ef4444"/></svg>`;
             const iconUrl = 'data:image/svg+xml;base64,' + btoa(iconSvg);
-
-            // Inyectar Favicons
             const linkIcon = document.createElement('link'); linkIcon.rel = 'icon'; linkIcon.href = iconUrl; document.head.appendChild(linkIcon);
             const linkApple = document.createElement('link'); linkApple.rel = 'apple-touch-icon'; linkApple.href = iconUrl; document.head.appendChild(linkApple);
-
-            // Generar Manifest Dinámico
-            const manifest = {
-                name: "IronLog",
-                short_name: "IronLog",
-                start_url: ".",
-                display: "standalone",
-                background_color: "#0f172a",
-                theme_color: "#0f172a",
-                icons: [{ src: iconUrl, sizes: "512x512", type: "image/svg+xml" }]
-            };
+            const manifest = { name: "IronLog", short_name: "IronLog", start_url: ".", display: "standalone", background_color: "#0f172a", theme_color: "#0f172a", icons: [{ src: iconUrl, sizes: "512x512", type: "image/svg+xml" }] };
             const manifestUrl = 'data:application/manifest+json;base64,' + btoa(JSON.stringify(manifest));
             const linkManifest = document.createElement('link'); linkManifest.rel = 'manifest'; linkManifest.href = manifestUrl; document.head.appendChild(linkManifest);
         })();
@@ -76,9 +67,7 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo, useRef } = React;
 
-        // --- ICONOS ---
         const Icon = ({ d, className, size=24 }) => <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{d}</svg>;
-        
         const Icons = {
             ChevronLeft: (p) => <Icon {...p} d={<path d="m15 18-6-6 6-6"/>} />,
             Trash2: (p) => <Icon {...p} d={<><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></>} />,
@@ -117,25 +106,17 @@
             DownloadCloud: (p) => <Icon {...p} d={<><polyline points="8 17 12 21 16 17"/><line x1="12" x2="12" y1="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></>} />
         };
 
-        // --- CONFIG Y DATOS ---
-        const MUSCLE_GROUPS = { 
-            CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', 
-            GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', 
-            BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS',
-            ABS: 'ABS', FOREARMS: 'FOREARMS'
-        };
-        
+        const MUSCLE_GROUPS = { CHEST: 'CHEST', BACK: 'BACK', QUADS: 'QUADS', HAMS: 'HAMSTRINGS', GLUTES: 'GLUTES', CALVES: 'CALVES', SHOULDERS: 'SHOULDERS', BICEPS: 'BICEPS', TRICEPS: 'TRICEPS', TRAPS: 'TRAPS', ABS: 'ABS', FOREARMS: 'FOREARMS' };
         const SUPERSET_COLORS = [{ border: 'border-orange-500', bg: 'bg-orange-500', text: 'text-orange-600', light: 'bg-orange-50' }, { border: 'border-purple-500', bg: 'bg-purple-500', text: 'text-purple-600', light: 'bg-purple-50' }, { border: 'border-cyan-500', bg: 'bg-cyan-500', text: 'text-cyan-600', light: 'bg-cyan-50' }, { border: 'border-pink-500', bg: 'bg-pink-500', text: 'text-pink-600', light: 'bg-pink-50' }];
-        
         const TRANSLATIONS = {
             en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps", TRAPS: "Traps", ABS: "Abs", FOREARMS: "Forearms" },
             editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
             manageEx: "Manage Exercises", addEx: "Add New Exercise", exName: "Exercise Name", selectMuscle: "Select Muscle", deleteConfirm: "Delete this exercise?",
-            setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit" },
+            setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit", addExercise: "Add Exercise", updateTemplate: "Update Routine Template" },
             es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios", ABS: "Abdominales", FOREARMS: "Antebrazos" },
             editTemplate: "Editar Programa", resetTemplate: "Restaurar Defecto", editDay: "Editar Día", addDay: "Añadir Día", addSlot: "Añadir Slot", save: "Guardar", swapTitle: "Reemplazar Ejercicio", swapMsg: "¿Cómo quieres aplicar este cambio?", swapSession: "Solo esta Sesión", swapForever: "Actualizar Plan (Para siempre)", programEditor: "Editor de Programa", selectExBtn: "Elegir Ejercicio", any: "Cualquiera", reps: "Reps",
             manageEx: "Gestionar Ejercicios", addEx: "Añadir Nuevo Ejercicio", exName: "Nombre del Ejercicio", selectMuscle: "Seleccionar Músculo", deleteConfirm: "¿Borrar este ejercicio?",
-            setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso" }
+            setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso", addExercise: "Añadir Ejercicio", updateTemplate: "Actualizar Rutina Original" }
         };
 
         const DEFAULT_LIBRARY = [
@@ -187,18 +168,14 @@
             return (
                 <svg viewBox="0 0 200 400" className="w-24 h-48 mx-auto opacity-90">
                     <circle cx="100" cy="30" r="20" fill="#4b5563" />
-                    {/* Traps Polygon */}
                     <path d="M 100 50 L 130 60 L 120 70 L 80 70 L 70 60 Z" fill={getColor(MUSCLE_GROUPS.TRAPS)} />
                     <path d="M60 60 Q100 50 140 60 L130 90 L70 90 Z" fill={getColor(MUSCLE_GROUPS.SHOULDERS)} />
                     <path d="M70 90 L130 90 L125 130 L75 130 Z" fill={getColor(MUSCLE_GROUPS.CHEST)} />
-                    {/* ABS */}
                     <rect x="85" y="140" width="30" height="40" rx="2" fill={getColor(MUSCLE_GROUPS.ABS)} />
                     <rect x="40" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.BICEPS)} />
                     <rect x="140" y="65" width="20" height="60" rx="10" fill={getColor(MUSCLE_GROUPS.TRICEPS)} />
-                    {/* FOREARMS */}
                     <rect x="35" y="130" width="15" height="40" rx="5" fill={getColor(MUSCLE_GROUPS.FOREARMS)} />
                     <rect x="150" y="130" width="15" height="40" rx="5" fill={getColor(MUSCLE_GROUPS.FOREARMS)} />
-                    
                     <path d="M75 130 L125 130 L120 180 L80 180 Z" fill={getColor(MUSCLE_GROUPS.BACK)} />
                     <path d="M80 180 L120 180 L130 280 L110 280 L100 200 L90 280 L70 280 Z" fill={getColor(MUSCLE_GROUPS.QUADS)} />
                     <rect x="70" y="285" width="20" height="50" rx="5" fill={getColor(MUSCLE_GROUPS.CALVES)} />
@@ -231,15 +208,8 @@
         const ExerciseManager = ({ exercises, onSave, onCancel, onDelete, t, tm }) => {
             const [newExName, setNewExName] = useState("");
             const [newExMuscle, setNewExMuscle] = useState(MUSCLE_GROUPS.CHEST);
-            
-            const handleAdd = () => {
-                if(!newExName.trim()) return;
-                onSave(newExName, newExMuscle);
-                setNewExName("");
-            };
-
+            const handleAdd = () => { if(!newExName.trim()) return; onSave(newExName, newExMuscle); setNewExName(""); };
             const getExName = (ex) => typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
-
             return (
                 <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
                      <div className="bg-white dark:bg-slate-800 px-4 h-14 border-b border-gray-200 dark:border-slate-700 flex items-center justify-between shrink-0">
@@ -277,17 +247,10 @@
         const TemplateEditor = ({ program, exercises, onSave, onCancel, t, tm, onCreateExercise }) => {
             const [localProgram, setLocalProgram] = useState(JSON.parse(JSON.stringify(program)));
             const [exSelector, setExSelector] = useState(null); 
-
             const updateDayName = (dayIdx, val) => { const n = [...localProgram]; n[dayIdx].dayName[t.lang === 'es'?'es':'en'] = val; setLocalProgram(n); };
             const updateSlotMuscle = (dayIdx, slotIdx, muscle) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].muscle = muscle; n[dayIdx].slots[slotIdx].exerciseId = null; setLocalProgram(n); };
             const updateSlotReps = (dayIdx, slotIdx, reps) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].reps = reps; setLocalProgram(n); };
-            
-            const updateSlotSets = (dayIdx, slotIdx, sets) => { 
-                const n = [...localProgram]; 
-                n[dayIdx].slots[slotIdx].setTarget = sets === '' ? '' : Number(sets); 
-                setLocalProgram(n); 
-            };
-            
+            const updateSlotSets = (dayIdx, slotIdx, sets) => { const n = [...localProgram]; n[dayIdx].slots[slotIdx].setTarget = sets === '' ? '' : Number(sets); setLocalProgram(n); };
             const handleExSelect = (ex) => {
                 const { dayIdx, slotIdx } = exSelector;
                 const n = [...localProgram];
@@ -295,17 +258,11 @@
                 setLocalProgram(n);
                 setExSelector(null);
             };
-
             const addSlot = (dayIdx) => { const n = [...localProgram]; n[dayIdx].slots.push({ muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }); setLocalProgram(n); };
             const removeSlot = (dayIdx, slotIdx) => { const n = [...localProgram]; n[dayIdx].slots.splice(slotIdx, 1); setLocalProgram(n); };
             const addDay = () => { setLocalProgram([...localProgram, { id: `d${Date.now()}`, dayName: { en: "New Day", es: "Nuevo Día" }, slots: [{ muscle: MUSCLE_GROUPS.CHEST, setTarget: 3 }] }]); };
             const removeDay = (idx) => { const n = [...localProgram]; n.splice(idx, 1); setLocalProgram(n); };
-
-            const getExName = (id) => {
-                const ex = exercises.find(e => e.id === id);
-                if(!ex) return null;
-                return typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name;
-            };
+            const getExName = (id) => { const ex = exercises.find(e => e.id === id); if(!ex) return null; return typeof ex.name === 'object' ? (ex.name[t.lang] || ex.name['en']) : ex.name; };
 
             return (
                 <div className="fixed inset-0 z-[60] bg-gray-50 dark:bg-slate-900 flex flex-col animate-fade-in h-full">
@@ -335,19 +292,8 @@
                                                  <button onClick={() => setExSelector({ dayIdx: dIdx, slotIdx: sIdx, muscleFilter: slot.muscle })} className={`flex-1 text-left px-2 py-1.5 rounded text-xs font-medium border ${slot.exerciseId ? 'bg-white dark:bg-slate-800 border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white' : 'bg-gray-100 dark:bg-slate-700 border-dashed border-gray-300 dark:border-slate-600 text-gray-400'}`}>
                                                     {slot.exerciseId ? getExName(slot.exerciseId) : t.selectExBtn}
                                                  </button>
-                                                 <input 
-                                                    placeholder={t.reps}
-                                                    value={slot.reps || ''} 
-                                                    onChange={e => updateSlotReps(dIdx, sIdx, e.target.value)}
-                                                    className="w-14 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
-                                                 />
-                                                 <input 
-                                                    type="number"
-                                                    placeholder={t.setsCount}
-                                                    value={slot.setTarget === undefined ? 3 : slot.setTarget} 
-                                                    onChange={e => updateSlotSets(dIdx, sIdx, e.target.value)}
-                                                    className="w-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500"
-                                                 />
+                                                 <input placeholder={t.reps} value={slot.reps || ''} onChange={e => updateSlotReps(dIdx, sIdx, e.target.value)} className="w-14 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500" />
+                                                 <input type="number" placeholder={t.setsCount} value={slot.setTarget === undefined ? 3 : slot.setTarget} onChange={e => updateSlotSets(dIdx, sIdx, e.target.value)} className="w-12 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded py-1.5 px-2 text-xs font-medium text-center text-gray-900 dark:text-white placeholder-gray-400 focus:ring-1 focus:ring-red-500" />
                                             </div>
                                         </div>
                                     ))}
@@ -358,31 +304,18 @@
                         <button onClick={addDay} className="w-full py-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl font-bold text-sm flex items-center justify-center gap-2"><Icons.Plus className="w-4 h-4"/> {t.addDay}</button>
                     </div>
                     {exSelector && (
-                        <ExerciseSelector 
-                            muscleFilter={exSelector.muscleFilter} 
-                            slotLabel={tm(exSelector.muscleFilter)} 
-                            exercises={exercises} 
-                            onSelect={handleExSelect} 
-                            onCancel={() => setExSelector(null)} 
-                            onCreate={(name, muscle) => {
-                                const newEx = onCreateExercise(name, muscle);
-                                handleExSelect(newEx);
-                            }} 
-                            t={t}
-                            tm={tm}
-                        />
+                        <ExerciseSelector muscleFilter={exSelector.muscleFilter} slotLabel={tm(exSelector.muscleFilter)} exercises={exercises} onSelect={handleExSelect} onCancel={() => setExSelector(null)} onCreate={(name, muscle) => { const newEx = onCreateExercise(name, muscle); handleExSelect(newEx); }} t={t} tm={tm} />
                     )}
                 </div>
             );
         };
 
-        const SummaryView = ({ data, onClose, t }) => {
+        const SummaryView = ({ data, onClose, t, onUpdateTemplate }) => {
+            const [updateTemplate, setUpdateTemplate] = useState(false);
             const handleShare = () => {
                 const text = `IRONLOG WORKOUT\n${data.name}\n${Math.floor(data.duration/60)} min • ${data.totalVolume}kg Vol\n${data.totalSets} Sets • ${data.totalReps} Reps`;
                 if (navigator.share) navigator.share({ title: 'IronLog Workout', text });
-                else {
-                    const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Resumen copiado!");
-                }
+                else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Resumen copiado!"); }
             };
             return (
                 <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 animate-fade-in text-center overflow-hidden">
@@ -400,9 +333,19 @@
                             <div className="border-t border-slate-700 pt-4"><BodyHeatmap workedMuscles={data.workedMuscles} /></div>
                         </div>
                         <div className="flex flex-col gap-3">
+                            <div className="flex items-center justify-center gap-3 p-3 bg-slate-800 border border-slate-700 rounded-xl mb-2">
+                                <label className="flex items-center gap-3 cursor-pointer">
+                                    <div className="relative">
+                                        <input type="checkbox" className="sr-only toggle-checkbox" checked={updateTemplate} onChange={() => setUpdateTemplate(!updateTemplate)} />
+                                        <div className={`block w-10 h-6 rounded-full transition-colors ${updateTemplate ? 'bg-red-600' : 'bg-slate-600'}`}></div>
+                                        <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${updateTemplate ? 'translate-x-4' : ''}`}></div>
+                                    </div>
+                                    <span className="text-sm font-bold text-white">{t.updateTemplate}</span>
+                                </label>
+                            </div>
                             <div className="flex gap-3">
                                 <button onClick={handleShare} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"><Icons.Share2 className="w-4 h-4" /> {t.share}</button>
-                                <button onClick={onClose} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/20">{t.close}</button>
+                                <button onClick={() => onClose(updateTemplate)} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/20">{t.close}</button>
                             </div>
                         </div>
                     </div>
@@ -449,12 +392,7 @@
             const t = { ...TRANSLATIONS[lang], lang };
             const tm = (key) => TRANSLATIONS[lang].muscle[key] || key;
             const [view, setView] = useState('home');
-            
-            const useLS = (key, initial) => {
-                const [val, setVal] = useState(() => { try { return JSON.parse(localStorage.getItem(key)) || initial; } catch { return initial; } });
-                useEffect(() => localStorage.setItem(key, JSON.stringify(val)), [key, val]);
-                return [val, setVal];
-            };
+            const useLS = (key, initial) => { const [val, setVal] = useState(() => { try { return JSON.parse(localStorage.getItem(key)) || initial; } catch { return initial; } }); useEffect(() => localStorage.setItem(key, JSON.stringify(val)), [key, val]); return [val, setVal]; };
 
             const [program, setProgram] = useLS('il_prog_v15', DEFAULT_TEMPLATE);
             const [activeMeso, setActiveMeso] = useLS('il_meso_v15', null);
@@ -478,106 +416,49 @@
             const [swapConfirmation, setSwapConfirmation] = useState(null);
             const [installPrompt, setInstallPrompt] = useState(null);
             const wakeLockRef = useRef(null);
+            const [addingExerciseToSession, setAddingExerciseToSession] = useState(false); // NEW STATE
 
             useEffect(() => { document.documentElement.className = theme; }, [theme]);
             useEffect(() => { let i; if(restTimer.active && restTimer.timeLeft > 0) i = setInterval(() => setRestTimer(p=>({...p, timeLeft:p.timeLeft-1})), 1000); else if(restTimer.timeLeft===0) setRestTimer(p=>({...p, active:false})); return () => clearInterval(i); }, [restTimer.active, restTimer.timeLeft]);
             useEffect(() => { let i; if(activeSession?.startTime) i = setInterval(() => setSessionElapsed(Math.floor((Date.now()-activeSession.startTime)/1000)), 1000); else setSessionElapsed(0); return () => clearInterval(i); }, [activeSession?.startTime]);
             useEffect(() => { const req = async () => { if ('wakeLock' in navigator && view === 'workout' && preventSleep) try { wakeLockRef.current = await navigator.wakeLock.request('screen'); } catch(e){} }; if(view==='workout' && preventSleep) { req(); document.addEventListener('visibilitychange', () => document.visibilityState==='visible'&&req()); } return () => { if(wakeLockRef.current) wakeLockRef.current.release(); }; }, [view, preventSleep]);
 
-            // --- HISTORY HANDLING (BACK BUTTON) ---
+            // History handling
             useEffect(() => {
-                // Initialize history
-                if (!window.history.state) {
-                    window.history.replaceState({ view: 'home' }, '');
-                }
-
+                if (!window.history.state) window.history.replaceState({ view: 'home' }, '');
                 const handlePopState = (event) => {
                     const state = event.state;
-                    
-                    // Priority: Close Overlays first
-                    if (showSettings) {
-                        setShowSettings(false);
-                        return;
-                    }
-                    if (managingExercises) {
-                        setManagingExercises(false);
-                        return;
-                    }
-                    if (editingTemplate) {
-                        if(confirm("¿Descartar cambios?")) {
-                             setEditingTemplate(false);
-                        } else {
-                             // Push state back to prevent exit if user cancels
-                             window.history.pushState({ overlay: 'template' }, ''); 
-                        }
-                        return;
-                    }
-                    if (selectionContext) {
-                        setSelectionContext(null);
-                        return;
-                    }
-                    if (summaryData) {
-                        closeSummary();
-                        return;
-                    }
-
-                    // View Navigation
-                    if (state && state.view) {
-                        setView(state.view);
-                    } else {
-                        // Fallback
-                        setView('home');
-                    }
+                    if (showSettings) { setShowSettings(false); return; }
+                    if (managingExercises) { setManagingExercises(false); return; }
+                    if (editingTemplate) { if(confirm("¿Descartar cambios?")) setEditingTemplate(false); else window.history.pushState({ overlay: 'template' }, ''); return; }
+                    if (selectionContext) { setSelectionContext(null); return; }
+                    if (addingExerciseToSession) { setAddingExerciseToSession(false); return; } // CLOSE ADD EX MODAL
+                    if (summaryData) { closeSummary(); return; }
+                    if (state && state.view) setView(state.view); else setView('home');
                 };
-
                 window.addEventListener('popstate', handlePopState);
                 return () => window.removeEventListener('popstate', handlePopState);
-            }, [showSettings, managingExercises, editingTemplate, selectionContext, summaryData]);
+            }, [showSettings, managingExercises, editingTemplate, selectionContext, summaryData, addingExerciseToSession]);
 
-            const navigate = (newView) => {
-                setView(newView);
-                window.history.pushState({ view: newView }, '');
-            };
+            const navigate = (newView) => { setView(newView); window.history.pushState({ view: newView }, ''); };
+            const openOverlay = (overlayName, setter) => { setter(true); window.history.pushState({ overlay: overlayName }, ''); };
 
-            const openOverlay = (overlayName, setter) => {
-                setter(true);
-                window.history.pushState({ overlay: overlayName }, '');
-            };
+            // PWA Install
+            useEffect(() => { const handler = (e) => { e.preventDefault(); setInstallPrompt(e); }; window.addEventListener('beforeinstallprompt', handler); return () => window.removeEventListener('beforeinstallprompt', handler); }, []);
+            const handleInstall = async () => { if (!installPrompt) { alert("Para instalar en iOS: Pulsa Compartir y selecciona 'Añadir a pantalla de inicio'."); return; } installPrompt.prompt(); const { outcome } = await installPrompt.userChoice; if (outcome === 'accepted') setInstallPrompt(null); };
 
-            // PWA Install Logic
-            useEffect(() => {
-                const handler = (e) => {
-                    e.preventDefault();
-                    setInstallPrompt(e);
-                };
-                window.addEventListener('beforeinstallprompt', handler);
-                return () => window.removeEventListener('beforeinstallprompt', handler);
-            }, []);
-
-            const handleInstall = async () => {
-                if (!installPrompt) {
-                    alert("Para instalar en iOS: Pulsa Compartir y selecciona 'Añadir a pantalla de inicio'.");
-                    return;
-                }
-                installPrompt.prompt();
-                const { outcome } = await installPrompt.userChoice;
-                if (outcome === 'accepted') setInstallPrompt(null);
-            };
-
-            const getExName = (ex) => {
-                if (!ex) return "Unknown";
-                return typeof ex.name === 'object' ? (ex.name[lang] || ex.name['en']) : ex.name;
-            };
+            const getExName = (ex) => { if (!ex) return "Unknown"; return typeof ex.name === 'object' ? (ex.name[lang] || ex.name['en']) : ex.name; };
 
             const startMesocycle = () => { const initialPlan = program.map(day => day.slots.map(slot => slot.exerciseId || null)); setActiveMeso({ id: Date.now(), week: 1, plan: initialPlan }); };
             
-            const handleTemplateCreateExercise = (name, muscle) => {
-                const newEx = { id: `custom_${Date.now()}`, name, muscle };
-                setExercises(prev => [...prev, newEx]);
-                return newEx;
-            };
+            const handleTemplateCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises(prev => [...prev, newEx]); return newEx; };
 
-            const createExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); if(selectionContext) handleExerciseSelect(newEx); };
+            const createExercise = (name, muscle) => { 
+                const newEx = { id: `custom_${Date.now()}`, name, muscle }; 
+                setExercises([...exercises, newEx]); 
+                if(selectionContext) handleExerciseSelect(newEx);
+                if(addingExerciseToSession) handleAddExerciseToSession(newEx); // NEW
+            };
             const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
             const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
             const checkWeekCompletion = (currentMeso, currentLogs) => { if (!currentMeso) return; const weekLogs = currentLogs.filter(l => l.mesoId === currentMeso.id && l.week === currentMeso.week); if (program.every((_, d) => weekLogs.some(l => l.dayIdx === d))) setTimeout(() => setActiveMeso(p => ({ ...p, week: p.week + 1 })), 1000); };
@@ -586,19 +467,58 @@
                 const dayPlan = activeMeso.plan[dayIdx]; 
                 if (!dayPlan) return; 
                 const firstEmptyIdx = dayPlan.findIndex(s => s === null); 
-                if (firstEmptyIdx !== -1) { 
-                    const slotDef = program[dayIdx].slots[firstEmptyIdx]; 
-                    setSelectionContext({ dayIdx, slotIdx: firstEmptyIdx, muscle: slotDef.muscle, label: tm(slotDef.muscle) }); 
-                    window.history.pushState({ overlay: 'selection' }, '');
-                    return; 
-                } 
+                if (firstEmptyIdx !== -1) { const slotDef = program[dayIdx].slots[firstEmptyIdx]; setSelectionContext({ dayIdx, slotIdx: firstEmptyIdx, muscle: slotDef.muscle, label: tm(slotDef.muscle) }); window.history.pushState({ overlay: 'selection' }, ''); return; } 
                 if (activeSession && activeSession.dayIdx === dayIdx) { navigate('workout'); return; } 
-                const sessionExs = dayPlan.map((exId, idx) => { const exDef = exercises.find(e => e.id === exId) || exercises[0]; const slotDef = program[dayIdx].slots[idx]; const targetSets = slotDef.setTarget || 3; const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; }); setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); navigate('workout'); 
+                
+                const sessionExs = dayPlan.map((exId, idx) => { 
+                    const exDef = exercises.find(e => e.id === exId) || exercises[0]; 
+                    const slotDef = program[dayIdx].slots[idx]; // Uses CURRENT program slot
+                    const targetSets = slotDef.setTarget || 3; 
+                    const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); 
+                    return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; 
+                }); 
+                setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); navigate('workout'); 
             };
             
             const skipSession = (dayIdx) => { const log = { id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, startTime: Date.now(), endTime: Date.now(), duration: 0, skipped: true, exercises: [], mesoId: activeMeso.id, week: activeMeso.week }; const newLogs = [log, ...logs]; setLogs(newLogs); setDayMenuOpenIdx(null); checkWeekCompletion(activeMeso, newLogs); };
             const handleExerciseSelect = (exercise) => { if (!selectionContext) return; const { dayIdx, slotIdx } = selectionContext; if (activeSession && activeSession.dayIdx === dayIdx) { setSwapConfirmation({ exercise, context: selectionContext }); setSelectionContext(null); return; } const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); setSelectionContext(null); setTimeout(() => startSession(dayIdx), 50); };
-            const confirmSwap = (mode) => { if (!swapConfirmation) return; const { exercise, context } = swapConfirmation; const { dayIdx, slotIdx } = context; const newExs = [...activeSession.exercises]; const prevEx = newExs[slotIdx]; newExs[slotIdx] = { ...exercise, slotLabel: prevEx.slotLabel, targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})), weightUnit: prevEx.weightUnit || 'kg' }; setActiveSession({ ...activeSession, exercises: newExs }); if (mode === 'forever') { const newPlan = [...activeMeso.plan]; newPlan[dayIdx][slotIdx] = exercise.id; setActiveMeso({ ...activeMeso, plan: newPlan }); } setSwapConfirmation(null); };
+            
+            const confirmSwap = (mode) => { 
+                if (!swapConfirmation) return; 
+                const { exercise, context } = swapConfirmation; 
+                const { dayIdx, slotIdx } = context; 
+                const newExs = [...activeSession.exercises]; 
+                const prevEx = newExs[slotIdx]; 
+                newExs[slotIdx] = { ...exercise, slotLabel: prevEx.slotLabel, targetReps: prevEx.targetReps, instanceId: Date.now() + Math.random(), note: prevEx.note, sets: prevEx.sets.map(s => ({...s, completed: false})), weightUnit: prevEx.weightUnit || 'kg' }; 
+                setActiveSession({ ...activeSession, exercises: newExs }); 
+                
+                if (mode === 'forever') { 
+                    const newPlan = [...activeMeso.plan]; 
+                    newPlan[dayIdx][slotIdx] = exercise.id; 
+                    setActiveMeso({ ...activeMeso, plan: newPlan }); 
+                    // FIX: Update Program Slot Muscle too
+                    const newProgram = [...program];
+                    newProgram[dayIdx].slots[slotIdx].muscle = exercise.muscle;
+                    newProgram[dayIdx].slots[slotIdx].exerciseId = exercise.id;
+                    setProgram(newProgram);
+                } 
+                setSwapConfirmation(null); 
+            };
+
+            const handleAddExerciseToSession = (exercise) => {
+                const newEx = {
+                    ...exercise,
+                    slotLabel: tm(exercise.muscle),
+                    targetReps: '',
+                    instanceId: Date.now() + Math.random(),
+                    note: '',
+                    sets: [{ id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }],
+                    weightUnit: 'kg'
+                };
+                setActiveSession(prev => ({ ...prev, exercises: [...prev.exercises, newEx] }));
+                setAddingExerciseToSession(false);
+            };
+
             const toggleSet = (exId, setId) => { const ex = activeSession.exercises.find(e => e.instanceId === exId); const set = ex.sets.find(s => s.id === setId); if(set.skipped) return; const completing = !set.completed; let start = activeSession.startTime; if(completing && !start) start = Date.now(); setActiveSession(p => ({...p, startTime: start, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? { ...s, completed: completing } : s)} : e)})); if(completing) setRestTimer({ active: true, timeLeft: 120, duration: 120 }); };
             const updateSet = (exId, setId, f, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? {...s, [f]: v} : s)} : e)}));
             const updateNote = (exId, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, note: v} : e)}));
@@ -616,7 +536,37 @@
             const getSupersetColor = (ssid) => { if(!activeSession) return SUPERSET_COLORS[0]; const u = [...new Set(activeSession.exercises.map(e=>e.supersetId).filter(Boolean))]; return SUPERSET_COLORS[u.indexOf(ssid) % SUPERSET_COLORS.length]; };
             const toggleUnit = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, weightUnit: e.weightUnit === 'pl' ? 'kg' : 'pl'} : e)}));
             const finishWorkout = () => { const duration = activeSession.startTime ? (Date.now() - activeSession.startTime)/1000 : 0; let vol=0, sets=0, reps=0, muscles=[]; activeSession.exercises.forEach(ex => { let worked=false; ex.sets.forEach(s => { if(s.completed) { vol += (Number(s.weight)||0)*(Number(s.reps)||0); sets++; reps+=(Number(s.reps)||0); worked=true; } }); if(worked) muscles.push(ex.muscle); }); setSummaryData({ name: activeSession.name, duration, totalVolume: vol, totalSets: sets, totalReps: reps, workedMuscles: [...new Set(muscles)], sessionData: { ...activeSession, endTime: Date.now(), duration } }); };
-            const closeSummary = () => { const log = summaryData.sessionData; const newLogs = [log, ...logs]; setLogs(newLogs); setActiveSession(null); setRestTimer({active:false}); setSummaryData(null); navigate('home'); checkWeekCompletion(activeMeso, newLogs); };
+            
+            const closeSummary = (shouldUpdateTemplate) => { 
+                const log = summaryData.sessionData; 
+                
+                if (shouldUpdateTemplate) {
+                    const newProgram = [...program];
+                    // Map current session exercises to slot definitions
+                    const newSlots = activeSession.exercises.map(ex => ({
+                        muscle: ex.muscle,
+                        setTarget: ex.sets.length,
+                        reps: ex.targetReps,
+                        exerciseId: ex.id
+                    }));
+                    newProgram[activeSession.dayIdx].slots = newSlots;
+                    setProgram(newProgram);
+                    
+                    // Also update activeMeso plan for consistency
+                    const newMesoPlan = [...activeMeso.plan];
+                    newMesoPlan[activeSession.dayIdx] = activeSession.exercises.map(e => e.id);
+                    setActiveMeso({...activeMeso, plan: newMesoPlan});
+                }
+
+                const newLogs = [log, ...logs]; 
+                setLogs(newLogs); 
+                setActiveSession(null); 
+                setRestTimer({active:false}); 
+                setSummaryData(null); 
+                navigate('home'); 
+                checkWeekCompletion(activeMeso, newLogs); 
+            };
+            
             const exportData = () => { const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ activeMeso, activeSession, exercises, logs, program })); const da = document.createElement('a'); da.setAttribute("href", dataStr); da.setAttribute("download", "ironlog_backup.json"); document.body.appendChild(da); da.click(); da.remove(); };
             const importData = (e) => { const fr = new FileReader(); fr.readAsText(e.target.files[0], "UTF-8"); fr.onload = ev => { if(confirm(t.importConfirm)) { const p = JSON.parse(ev.target.result); setActiveMeso(p.activeMeso); setActiveSession(p.activeSession); setExercises(p.exercises); setLogs(p.logs); if(p.program) setProgram(p.program); alert(t.dataSaved); } }; };
             const getVolumeStatus = (sets) => { if (sets < 6) return { label: t.volumeStatus.low, color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-slate-700' }; if (sets < 10) return { label: t.volumeStatus.maintenance, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' }; if (sets <= 20) return { label: t.volumeStatus.optimal, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' }; return { label: t.volumeStatus.high, color: 'text-orange-500', bg: 'bg-orange-100 dark:bg-orange-900/30' }; };
@@ -664,8 +614,9 @@
                         {selectionContext && <ExerciseSelector muscleFilter={selectionContext.muscle} slotLabel={tm(selectionContext.muscle)} exercises={exercises} onSelect={handleExerciseSelect} onCancel={() => setSelectionContext(null)} onCreate={createExercise} t={t} tm={tm} />}
                         {editingTemplate && <TemplateEditor program={program} exercises={exercises} onSave={(p) => { setProgram(p); setEditingTemplate(false); }} onCancel={() => setEditingTemplate(false)} t={t} tm={tm} onCreateExercise={handleTemplateCreateExercise} />}
                         {managingExercises && <ExerciseManager exercises={exercises} onSave={manualCreateExercise} onDelete={deleteCustomExercise} onCancel={() => setManagingExercises(false)} t={t} tm={tm} />}
+                        {addingExerciseToSession && <ExerciseSelector muscleFilter={null} slotLabel={t.addExercise} exercises={exercises} onSelect={handleAddExerciseToSession} onCancel={() => setAddingExerciseToSession(false)} onCreate={createExercise} t={t} tm={tm} />}
                         {swapConfirmation && <SwapConfirmationModal isOpen={!!swapConfirmation} onClose={() => setSwapConfirmation(null)} onSessionOnly={() => confirmSwap('session')} onForever={() => confirmSwap('forever')} t={t} exerciseName={getExName(swapConfirmation?.exercise)} />}
-                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} />}
+                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} onUpdateTemplate={setUpdateTemplate} />}
 
                         {/* HEADER & NAV */}
                         {view !== 'workout' && (
@@ -702,41 +653,6 @@
                                             </div>
                                         );
                                     })}</div>}
-                                </div>
-                            )}
-                            {view === 'history' && (
-                                <div className="p-4 space-y-6">
-                                    {activeMeso && <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm flex justify-between"><div><div className="text-xs font-bold text-gray-400 uppercase">{t.mesoStats}</div><div className="text-2xl font-black text-gray-900 dark:text-white font-mono">{mesoStats?.totalWorkouts||0}</div><div className="text-xs text-gray-500">{t.totalWorkouts}</div></div><div className="text-right"><div className="text-xs font-bold text-gray-400 uppercase">{t.currentWeek}</div><div className="text-2xl font-black text-red-600 font-mono">{activeMeso.week}</div></div></div>}
-                                    
-                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
-                                        <div className="flex items-center gap-2 mb-4"><Icons.BarChart2 className="w-5 h-5 text-red-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.volume} ({t.week} {weeklyVolumeData.week})</h3></div>
-                                        {Object.keys(weeklyVolumeData.data).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
-                                            <div className="space-y-4">{Object.entries(weeklyVolumeData.data).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => {
-                                                const status = getVolumeStatus(sets);
-                                                return (
-                                                    <div key={muscle}>
-                                                        <div className="flex justify-between items-end mb-1">
-                                                            <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">{tm(muscle)}</span>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${status.bg} ${status.color}`}>{status.label}</span>
-                                                                <span className="text-xs font-bold text-gray-900 dark:text-white">{sets} {t.sets}</span>
-                                                            </div>
-                                                        </div>
-                                                        <ProgressBar value={sets} max={25} />
-                                                    </div>
-                                                );
-                                            })}</div>
-                                        )}
-                                    </div>
-
-                                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
-                                        <div className="flex items-center gap-2 mb-4"><Icons.Activity className="w-5 h-5 text-blue-600" /><h3 className="font-bold text-gray-900 dark:text-white">{t.mesoAvg}</h3></div>
-                                        {Object.keys(mesoAverageVolume).length === 0 ? <div className="text-center text-sm text-gray-500 py-2">{t.noData}</div> : (
-                                            <div className="space-y-3">{Object.entries(mesoAverageVolume).sort(([,a],[,b]) => b-a).map(([muscle, sets]) => (<div key={muscle}><div className="flex justify-between text-xs font-bold uppercase text-gray-500 dark:text-gray-400 mb-1"><span>{tm(muscle)}</span><span>{sets} {t.sets} / {t.week}</span></div><ProgressBar value={sets} max={20} colorClass="bg-blue-500" /></div>))}</div>
-                                        )}
-                                    </div>
-
-                                    <div className="space-y-2">{logs.map(log => (<div key={log.id} className={`p-3 rounded-lg border flex justify-between items-center ${log.skipped?'bg-gray-100 dark:bg-slate-800/50':'bg-white dark:bg-slate-800 shadow-sm border-gray-200 dark:border-slate-700'}`}><div><div className={`font-bold text-sm ${log.skipped?'text-gray-400 line-through':'text-gray-900 dark:text-gray-100'}`}>{log.name}</div><div className="text-xs text-gray-500">{formatDate(log.endTime, lang)}</div></div>{log.skipped ? <span className="text-[10px] font-bold bg-gray-200 text-gray-500 px-2 py-1 rounded">{t.skipped}</span> : <span className="text-[10px] font-bold bg-green-100 text-green-700 px-2 py-1 rounded">{Math.floor(log.duration/60)}m</span>}</div>))}</div>
                                 </div>
                             )}
                             {view === 'workout' && activeSession && (
@@ -798,7 +714,15 @@
                                                 </div>
                                             );
                                         })}
-                                        <div className="flex justify-center pt-6"><button onClick={finishWorkout} className="flex items-center gap-2 px-6 py-3 bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900 text-red-600 dark:text-red-400 rounded-full font-bold shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Icons.Check className="w-5 h-5" /> {t.finishWorkout}</button></div>
+                                        <div className="flex flex-col items-center justify-center gap-3 pt-6">
+                                            <button 
+                                                onClick={() => openOverlay('adding_exercise', setAddingExerciseToSession)} 
+                                                className="w-full py-3 border-2 border-dashed border-gray-300 dark:border-slate-700 rounded-xl text-sm font-bold text-gray-500 dark:text-gray-400 uppercase hover:border-red-500 hover:text-red-500 transition-colors flex items-center justify-center gap-2"
+                                            >
+                                                <Icons.Plus className="w-4 h-4" /> {t.addExercise}
+                                            </button>
+                                            <button onClick={finishWorkout} className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900 text-red-600 dark:text-red-400 rounded-full font-bold shadow-sm hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"><Icons.Check className="w-5 h-5" /> {t.finishWorkout}</button>
+                                        </div>
                                     </div>
                                     <Modal isOpen={!!setMenuContext} onClose={() => setSetMenuContext(null)}><div className="bg-white dark:bg-slate-800"><div className="p-4 border-b border-gray-100 dark:border-slate-700"><h3 className="font-bold text-gray-900 dark:text-white">{t.sets}</h3></div><div className="p-2 space-y-1"><button onClick={() => { addSetAt(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm"><Icons.CornerDownRight className="w-4 h-4" /> {t.addSetBelow}</button><button onClick={() => { toggleSkipSet(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-3 text-gray-700 dark:text-gray-300 font-medium text-sm">{setMenuContext?.skipped ? <Icons.Play className="w-4 h-4" /> : <Icons.SkipForward className="w-4 h-4" />} {setMenuContext?.skipped ? t.unskipSet : t.skipSet}</button><button onClick={() => { deleteSetAt(setMenuContext.exId, setMenuContext.setId); setSetMenuContext(null); }} className="w-full text-left px-4 py-3 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 text-red-600 dark:text-red-400 font-medium text-sm"><Icons.Trash2 className="w-4 h-4" /> {t.deleteSet}</button></div><div className="border-t border-gray-100 dark:border-slate-700 p-2"><div className="px-4 py-2 text-xs font-bold text-gray-400 uppercase tracking-wider">{t.setType}</div>{['regular', 'myorep', 'myorep_match', 'cluster', 'top', 'backoff'].map(type => (<button key={type} onClick={() => { changeSetType(setMenuContext.exId, setMenuContext.setId, type); setSetMenuContext(null); }} className={`w-full text-left px-4 py-2 flex items-center gap-3 text-sm rounded-lg ${setMenuContext?.type === type ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-bold' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'}`}><div className={`w-3 h-3 rounded-full border ${setMenuContext?.type === type ? 'border-red-500 bg-red-500' : 'border-gray-400'}`}></div><div><div>{t.types[type]}</div><div className="text-[10px] font-normal opacity-70">{t.typeDesc[type]}</div></div></button>))}</div></div></Modal>
                                 </div>
