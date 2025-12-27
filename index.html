@@ -163,7 +163,19 @@
 
         // --- COMPONENTS ---
         const formatDate = (d, l) => new Date(d).toLocaleDateString(l==='en'?'en-US':'es-ES', {weekday:'short',month:'short',day:'numeric'});
-        const formatSeconds = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+        const formatSeconds = (s) => {
+            const sec = Math.max(0, Math.floor(Number(s) || 0));
+            return `${Math.floor(sec/60)}:${(sec%60).toString().padStart(2,'0')}`;
+        };
+
+        // For end-of-workout summary: show only hours:minutes (no seconds)
+        const formatHoursMinutes = (s) => {
+            const sec = Math.max(0, Math.floor(Number(s) || 0));
+            const totalMin = Math.floor(sec / 60);
+            const h = Math.floor(totalMin / 60);
+            const m = totalMin % 60;
+            return `${h}:${m.toString().padStart(2,'0')}`;
+        };
 
         const RPIcon = () => <div className="flex items-center gap-2"><div className="w-6 h-6 bg-red-600 rounded flex items-center justify-center text-white font-black italic text-xs shadow-sm">RP</div><h1 className="text-gray-900 dark:text-white font-bold tracking-tight">Hypertrophy <span className="text-gray-400 font-normal">Beta</span></h1></div>;
         const MuscleTag = ({ label }) => <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white dark:bg-slate-800 border border-red-200 dark:border-red-900 text-red-600 dark:text-red-400 shadow-sm whitespace-nowrap"><div className="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></div>{label}</span>;
@@ -359,7 +371,7 @@
                         <p className="text-slate-400 mb-6 font-medium text-sm">{t.goodJob}</p>
                         <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 mb-4">
                             <div className="grid grid-cols-2 gap-3 mb-4">
-                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.duration}</div><div className="text-lg font-bold text-white font-mono">{formatSeconds(data.duration)}</div></div>
+                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.duration}</div><div className="text-lg font-bold text-white font-mono">{formatHoursMinutes(data.duration)}</div></div>
                                 <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalVolume}</div><div className="text-lg font-bold text-red-400 font-mono">{data.totalVolume}kg</div></div>
                                 <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalSets}</div><div className="text-lg font-bold text-white">{data.totalSets}</div></div>
                                 <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalReps}</div><div className="text-lg font-bold text-white">{data.totalReps}</div></div>
@@ -435,7 +447,7 @@
             const [logs, setLogs] = useLS('il_logs_v15', []);
             const [showRIR, setShowRIR] = useLS('il_cfg_rir', true);
 
-            const [restTimer, setRestTimer] = useState({ active: false, timeLeft: 0, duration: 120 });
+            const [restTimer, setRestTimer] = useState({ active: false, timeLeft: 0, duration: 120, endAt: 0 });
             const [menuOpenId, setMenuOpenId] = useState(null);
             const [setMenuContext, setSetMenuContext] = useState(null);
             const [dayMenuOpenIdx, setDayMenuOpenIdx] = useState(null); 
@@ -454,7 +466,38 @@
             const [sessionSelectionTarget, setSessionSelectionTarget] = useState(null);
 
             useEffect(() => { document.documentElement.className = theme; }, [theme]);
-            useEffect(() => { let i; if(restTimer.active && restTimer.timeLeft > 0) i = setInterval(() => setRestTimer(p=>({...p, timeLeft:p.timeLeft-1})), 1000); else if(restTimer.timeLeft===0) setRestTimer(p=>({...p, active:false})); return () => clearInterval(i); }, [restTimer.active, restTimer.timeLeft]);
+            // Rest timer: derived from an absolute endAt timestamp so it stays accurate when the app loses focus.
+useEffect(() => {
+    let i;
+    const sync = () => {
+        setRestTimer(prev => {
+            if (!prev.active) return prev;
+            const now = Date.now();
+            const remainingMs = Math.max(0, (prev.endAt || 0) - now);
+            const secondsLeft = Math.ceil(remainingMs / 1000);
+            if (secondsLeft <= 0) {
+                return { ...prev, active: false, timeLeft: 0, endAt: 0 };
+            }
+            if (secondsLeft === prev.timeLeft) return prev;
+            return { ...prev, timeLeft: secondsLeft };
+        });
+    };
+
+    if (restTimer.active) {
+        sync();
+        i = setInterval(sync, 250);
+    }
+
+    const onVis = () => { if (!document.hidden) sync(); };
+    window.addEventListener('focus', sync);
+    document.addEventListener('visibilitychange', onVis);
+
+    return () => {
+        clearInterval(i);
+        window.removeEventListener('focus', sync);
+        document.removeEventListener('visibilitychange', onVis);
+    };
+}, [restTimer.active, restTimer.endAt]);
             useEffect(() => { let i; if(activeSession?.startTime) i = setInterval(() => setSessionElapsed(Math.floor((Date.now()-activeSession.startTime)/1000)), 1000); else setSessionElapsed(0); return () => clearInterval(i); }, [activeSession?.startTime]);
             useEffect(() => { const req = async () => { if ('wakeLock' in navigator && view === 'workout' && preventSleep) try { wakeLockRef.current = await navigator.wakeLock.request('screen'); } catch(e){} }; if(view==='workout' && preventSleep) { req(); document.addEventListener('visibilitychange', () => document.visibilityState==='visible'&&req()); } return () => { if(wakeLockRef.current) wakeLockRef.current.release(); }; }, [view, preventSleep]);
 
@@ -593,7 +636,11 @@
                 setSessionSelectionTarget(null);
             };
 
-            const toggleSet = (exId, setId) => { const ex = activeSession.exercises.find(e => e.instanceId === exId); const set = ex.sets.find(s => s.id === setId); if(set.skipped) return; const completing = !set.completed; let start = activeSession.startTime; if(completing && !start) start = Date.now(); setActiveSession(p => ({...p, startTime: start, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? { ...s, completed: completing } : s)} : e)})); if(completing) setRestTimer({ active: true, timeLeft: 120, duration: 120 }); };
+            const toggleSet = (exId, setId) => { const ex = activeSession.exercises.find(e => e.instanceId === exId); const set = ex.sets.find(s => s.id === setId); if(set.skipped) return; const completing = !set.completed; let start = activeSession.startTime; if(completing && !start) start = Date.now(); setActiveSession(p => ({...p, startTime: start, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? { ...s, completed: completing } : s)} : e)})); if (completing) {
+                    const dur = 120;
+                    const endAt = Date.now() + dur * 1000;
+                    setRestTimer({ active: true, timeLeft: dur, duration: dur, endAt });
+                } };
             const updateSet = (exId, setId, f, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? {...s, [f]: v} : s)} : e)}));
             const updateNote = (exId, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, note: v} : e)}));
             const addSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: [...e.sets, { id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }]} : e)}));
@@ -635,7 +682,7 @@
                 const newLogs = [log, ...logs]; 
                 setLogs(newLogs); 
                 setActiveSession(null); 
-                setRestTimer({active:false}); 
+                setRestTimer(p => ({ ...p, active: false, timeLeft: 0, endAt: 0 })); 
                 setSummaryData(null); 
                 navigate('home'); 
                 checkWeekCompletion(activeMeso, newLogs); 
@@ -852,7 +899,12 @@
                         {restTimer.active && (
                             <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 p-4 pb-8 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)] animate-slideUp">
                                 <div className="max-w-md mx-auto">
-                                    <div className="flex justify-between items-center mb-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Icons.Clock className="w-4 h-4" /></div><div><div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.resting}</div><div className="text-xl font-black text-gray-800 dark:text-white font-mono leading-none">{formatSeconds(restTimer.timeLeft)}</div></div></div><div className="flex gap-1"><button onClick={() => setRestTimer(p => ({...p, timeLeft: p.timeLeft+10}))} className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 rounded text-xs font-bold text-gray-600 dark:text-gray-300 transition-colors">+10</button><button onClick={() => setRestTimer(p => ({...p, active: false}))} className="ml-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded text-xs font-bold transition-colors">SKIP</button></div></div>
+                                    <div className="flex justify-between items-center mb-3"><div className="flex items-center gap-2"><div className="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center"><Icons.Clock className="w-4 h-4" /></div><div><div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{t.resting}</div><div className="text-xl font-black text-gray-800 dark:text-white font-mono leading-none">{formatSeconds(restTimer.timeLeft)}</div></div></div><div className="flex gap-1"><button onClick={() => setRestTimer(p => {
+                                            if (!p.active) return p;
+                                            const add = 10;
+                                            const newEndAt = (p.endAt || Date.now()) + add * 1000;
+                                            return { ...p, endAt: newEndAt, timeLeft: p.timeLeft + add, duration: p.duration + add };
+                                        })} className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 rounded text-xs font-bold text-gray-600 dark:text-gray-300 transition-colors">+10</button><button onClick={() => setRestTimer(p => ({ ...p, active: false, timeLeft: 0, endAt: 0 }))} className="ml-2 px-3 py-1.5 bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded text-xs font-bold transition-colors">SKIP</button></div></div>
                                     <div className="h-1 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden"><div className="h-full bg-red-500 transition-all duration-1000 ease-linear" style={{ width: `${(restTimer.timeLeft / restTimer.duration) * 100}%` }}></div></div>
                                 </div>
                             </div>
