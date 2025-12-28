@@ -75,6 +75,7 @@
             MoreVertical: (p) => <Icon {...p} d={<><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></>} />,
             Settings: (p) => <Icon {...p} d={<><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>} />,
             BarChart2: (p) => <Icon {...p} d={<><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></>} />,
+            TrendingUp: (p) => <Icon {...p} d={<><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></>} />,
             CornerDownRight: (p) => <Icon {...p} d={<><polyline points="15 10 20 15 15 20"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></>} />,
             Play: (p) => <Icon {...p} d={<polygon points="5 3 19 12 5 21 5 3"/>} />,
             Menu: (p) => <Icon {...p} d={<><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></>} />,
@@ -117,10 +118,11 @@
         
         const TRANSLATIONS = {
             en: { startMeso: "Start New Mesocycle", finishWorkout: "Finish Workout", finishConfirm: "Finish workout?", cancel: "Cancel", delete: "Delete", skip: "Skip Exercise", skipDay: "Skip Workout", skipped: "Skipped", completed: "Completed", swap: "Swap Exercise", addSetBelow: "Add Set Below", deleteSet: "Delete Set", skipSet: "Skip Set", unskipSet: "Unskip Set", sets: "Set", weight: "Weight", reps: "Reps", rir: "RIR", log: "Log", note: "Range: 6-10", active: "Active", history: "Progress", settings: "Settings", volume: "Weekly Volume", workouts: "Recent Workouts", noData: "No data", duration: "Duration", exercises: "Exercises", configure: "Configure", week: "WEEK", massPhase: "Mass Phase 1", resting: "Resting", language: "Language", theme: "Theme", back: "Back", finishCycle: "Finish Cycle", confirmCycle: "Finish current mesocycle?", selectEx: "Select Exercise", searchPlaceholder: "Search...", createEx: "Create", noExFound: "No exercises found", keepScreen: "Keep Screen On", setType: "SET TYPE", mesoStats: "Mesocycle Stats", totalWorkouts: "Total Workouts", currentWeek: "Current Week", linkSuperset: "Link Superset", unlinkSuperset: "Unlink", selectToLink: "Select exercise to link...", superset: "SUPERSET", workoutComplete: "WORKOUT COMPLETE", goodJob: "Great job!", totalVolume: "Total Volume", totalSets: "Total Sets", totalReps: "Total Reps", share: "Share", close: "Save & Close", resume: "Resume Workout", backup: "Data Backup", export: "Export Data", import: "Import Data", importConfirm: "Overwrite data?", dataSaved: "Saved!", addSet: "Set", remSet: "Set", delSlot: "Delete Slot", offline: "Local Mode", mesoAvg: "Meso Avg Volume", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Standard set", myorep: "Rest-pause", myorep_match: "Match reps", cluster: "Intra-set rest", top: "High intensity", backoff: "Volume work" }, muscle: { CHEST: "Chest", BACK: "Back", QUADS: "Quads", HAMSTRINGS: "Hamstrings", GLUTES: "Glutes", CALVES: "Calves", SHOULDERS: "Shoulders", BICEPS: "Biceps", TRICEPS: "Triceps", TRAPS: "Traps", ABS: "Abs", FOREARMS: "Forearms" },
-            editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
+            rp: "RP Progression", rpEnabled: "RP suggestions", rpTargetRIR: "Target RIR", rpFeedbackTitle: "Muscle feedback", rpRatingHelp: "1=too little, 3=good, 5=too much", rpSave: "Save feedback", rpSuggestion: "Suggested", rpNoSuggestion: "No suggestion",
+editTemplate: "Edit Program", resetTemplate: "Reset to Default", editDay: "Edit Day", addDay: "Add Day", addSlot: "Add Exercise Slot", save: "Save", swapTitle: "Swap Exercise", swapMsg: "How do you want to apply this change?", swapSession: "This Session Only", swapForever: "Update Plan (Forever)", programEditor: "Program Editor", selectExBtn: "Select Exercise", any: "Any", reps: "Reps",
             manageEx: "Manage Exercises", addEx: "Add New Exercise", exName: "Exercise Name", selectMuscle: "Select Muscle", deleteConfirm: "Delete this exercise?",
             setsCount: "Sets", notes: "Notes", addNote: "Add Note...", volumeStatus: { low: "Low", maintenance: "Maint.", optimal: "Optimal", high: "High" }, showRIR: "Show RIR Column", install: "Install App", unitToggle: "Weight Unit", addExercise: "Add Muscle Slot", updateTemplate: "Update Routine Template", selectMuscleToAdd: "Select Muscle to Add" },
-            es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", delSlot: "Eliminar Slot", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios", ABS: "Abdominales", FOREARMS: "Antebrazos" },
+            es: { startMeso: "Iniciar Mesociclo", finishWorkout: "Terminar Sesión", finishConfirm: "¿Terminar entrenamiento?", cancel: "Cancelar", delete: "Borrar", skip: "Saltar Ejercicio", skipDay: "Saltar Día", skipped: "Saltado", completed: "Completado", swap: "Reemplazar Ejercicio", addSetBelow: "Añadir Serie Debajo", deleteSet: "Borrar Serie", skipSet: "Saltar Serie", unskipSet: "Restaurar Serie", sets: "Serie", weight: "Peso", reps: "Reps", rir: "RIR", log: "Log", note: "Rango: 6-10", active: "Activo", history: "Progreso", settings: "Ajustes", rp: "Progresión RP", rpEnabled: "Sugerencias RP", rpTargetRIR: "RIR objetivo", volume: "Volumen Semanal", workouts: "Sesiones Recientes", noData: "Sin datos", duration: "Duración", exercises: "Ejercicios", configure: "Configurar", week: "SEMANA", massPhase: "Fase Volumen 1", resting: "Descansando", language: "Idioma", theme: "Tema", back: "Volver", finishCycle: "Terminar Ciclo", confirmCycle: "¿Terminar el mesociclo actual?", selectEx: "Seleccionar Ejercicio", searchPlaceholder: "Buscar...", createEx: "Crear", noExFound: "No encontrado", keepScreen: "Pantalla Encendida", setType: "TIPO DE SERIE", mesoStats: "Estadísticas Ciclo", totalWorkouts: "Entrenamientos", currentWeek: "Semana Actual", linkSuperset: "Vincular Superserie", unlinkSuperset: "Desvincular", selectToLink: "Selecciona para unir...", superset: "SUPERSERIE", workoutComplete: "¡ENTRENAMIENTO TERMINADO!", goodJob: "¡Buen trabajo!", totalVolume: "Volumen Total", totalSets: "Series Totales", totalReps: "Reps Totales", share: "Compartir", close: "Guardar y Cerrar", resume: "Reanudar", backup: "Copia de Seguridad", export: "Exportar Datos", import: "Importar Datos", importConfirm: "Esto sobrescribirá los datos. ¿Continuar?", dataSaved: "¡Guardado!", addSet: "Serie", remSet: "Serie", delSlot: "Eliminar Slot", offline: "Modo Local", mesoAvg: "Promedio Mesociclo", types: { regular: "Regular", myorep: "Myorep", myorep_match: "Myorep Match", cluster: "Cluster", top: "Top Set", backoff: "Back-off Set" }, typeDesc: { regular: "Estándar", myorep: "Rest-pause", myorep_match: "Igualar reps", cluster: "Descanso intra-serie", top: "Alta intensidad", backoff: "Trabajo volumen" }, muscle: { CHEST: "Pecho", BACK: "Espalda", QUADS: "Cuádriceps", HAMSTRINGS: "Isquios", GLUTES: "Glúteos", CALVES: "Gemelos", SHOULDERS: "Hombros", BICEPS: "Bíceps", TRICEPS: "Tríceps", TRAPS: "Trapecios", ABS: "Abdominales", FOREARMS: "Antebrazos" },
             editTemplate: "Editar Programa", resetTemplate: "Restaurar Defecto", editDay: "Editar Día", addDay: "Añadir Día", addSlot: "Añadir Slot", save: "Guardar", swapTitle: "Reemplazar Ejercicio", swapMsg: "¿Cómo quieres aplicar este cambio?", swapSession: "Solo esta Sesión", swapForever: "Actualizar Plan (Para siempre)", programEditor: "Editor de Programa", selectExBtn: "Elegir Ejercicio", any: "Cualquiera", reps: "Reps",
             manageEx: "Gestionar Ejercicios", addEx: "Añadir Nuevo Ejercicio", exName: "Nombre del Ejercicio", selectMuscle: "Seleccionar Músculo", deleteConfirm: "¿Borrar este ejercicio?",
             setsCount: "Series", notes: "Notas", addNote: "Añadir nota...", volumeStatus: { low: "Bajo", maintenance: "Mant.", optimal: "Óptimo", high: "Alto" }, showRIR: "Mostrar Columna RIR", install: "Instalar App", unitToggle: "Unidad Peso", addExercise: "Añadir Slot Muscular", updateTemplate: "Actualizar Rutina Original", selectMuscleToAdd: "Elegir Músculo para el Slot" }
@@ -356,48 +358,107 @@
             );
         };
 
-        const SummaryView = ({ data, onClose, t }) => {
-            const [updateTemplate, setUpdateTemplate] = useState(false);
-            const handleShare = () => {
-                const text = `IRONLOG WORKOUT\n${data.name}\n${Math.floor(data.duration/60)} min • ${data.totalVolume}kg Vol\n${data.totalSets} Sets • ${data.totalReps} Reps`;
-                if (navigator.share) navigator.share({ title: 'IronLog Workout', text });
-                else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Resumen copiado!"); }
-            };
-            return (
-                <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 animate-fade-in text-center overflow-hidden">
-                    <div className="relative z-10 w-full max-w-sm flex flex-col h-full justify-center">
-                        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50"><Icons.Check className="w-8 h-8 text-white" /></div>
-                        <h1 className="text-2xl font-black text-white italic tracking-tighter mb-1">{t.workoutComplete}</h1>
-                        <p className="text-slate-400 mb-6 font-medium text-sm">{t.goodJob}</p>
-                        <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 mb-4">
-                            <div className="grid grid-cols-2 gap-3 mb-4">
-                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.duration}</div><div className="text-lg font-bold text-white font-mono">{formatHoursMinutes(data.duration)}</div></div>
-                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalVolume}</div><div className="text-lg font-bold text-red-400 font-mono">{data.totalVolume}kg</div></div>
-                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalSets}</div><div className="text-lg font-bold text-white">{data.totalSets}</div></div>
-                                <div><div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalReps}</div><div className="text-lg font-bold text-white">{data.totalReps}</div></div>
-                            </div>
-                            <div className="border-t border-slate-700 pt-4"><BodyHeatmap workedMuscles={data.workedMuscles} /></div>
+        
+const SummaryView = ({ data, onClose, t, rpEnabled }) => {
+    const [updateTemplate, setUpdateTemplate] = useState(false);
+    const muscles = (data.workedMuscles || []);
+    const [feedback, setFeedback] = useState(() => {
+        const init = {};
+        muscles.forEach(m => init[m] = 3);
+        return init;
+    });
+
+    const handleShare = () => {
+        const text = `IRONLOG WORKOUT\n${data.name}\n${Math.floor(data.duration/60)} min • ${data.totalVolume}kg Vol\n${data.totalSets} Sets • ${data.totalReps} Reps`;
+        if (navigator.share) navigator.share({ title: 'IronLog Workout', text });
+        else { const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el); alert("Resumen copiado!"); }
+    };
+
+    const RatingRow = ({ muscle }) => (
+        <div className="flex items-center justify-between gap-3 py-2">
+            <div className="text-xs font-bold uppercase text-slate-300">{muscle}</div>
+            <input
+                type="range"
+                min="1"
+                max="5"
+                step="1"
+                value={feedback[muscle]}
+                onChange={e => setFeedback(p => ({ ...p, [muscle]: Number(e.target.value) }))}
+                className="flex-1"
+            />
+            <div className="w-8 text-right font-mono font-bold text-white">{feedback[muscle]}</div>
+        </div>
+    );
+
+    return (
+        <div className="fixed inset-0 z-[100] bg-slate-900 flex flex-col items-center justify-center p-6 animate-fade-in text-center overflow-hidden">
+            <div className="relative z-10 w-full max-w-sm flex flex-col h-full justify-center">
+                <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50">
+                    <Icons.Check className="w-8 h-8 text-white" />
+                </div>
+
+                <h1 className="text-2xl font-black text-white italic tracking-tighter mb-1">{t.workoutComplete}</h1>
+                <p className="text-slate-400 mb-6 font-medium text-sm">{t.goodJob}</p>
+
+                <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 mb-4">
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.duration}</div>
+                            <div className="text-lg font-bold text-white font-mono">{formatHoursMinutes(data.duration)}</div>
                         </div>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex items-center justify-center gap-3 p-3 bg-slate-800 border border-slate-700 rounded-xl mb-2">
-                                <label className="flex items-center gap-3 cursor-pointer">
-                                    <div className="relative">
-                                        <input type="checkbox" className="sr-only toggle-checkbox" checked={updateTemplate} onChange={() => setUpdateTemplate(!updateTemplate)} />
-                                        <div className={`block w-10 h-6 rounded-full transition-colors ${updateTemplate ? 'bg-red-600' : 'bg-slate-600'}`}></div>
-                                        <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${updateTemplate ? 'translate-x-4' : ''}`}></div>
-                                    </div>
-                                    <span className="text-sm font-bold text-white">{t.updateTemplate}</span>
-                                </label>
-                            </div>
-                            <div className="flex gap-3">
-                                <button onClick={handleShare} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"><Icons.Share2 className="w-4 h-4" /> {t.share}</button>
-                                <button onClick={() => onClose(updateTemplate)} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/20">{t.close}</button>
-                            </div>
+                        <div>
+                            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalVolume}</div>
+                            <div className="text-lg font-bold text-red-400 font-mono">{data.totalVolume}kg</div>
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalSets}</div>
+                            <div className="text-lg font-bold text-white">{data.totalSets}</div>
+                        </div>
+                        <div>
+                            <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t.totalReps}</div>
+                            <div className="text-lg font-bold text-white">{data.totalReps}</div>
                         </div>
                     </div>
+                    <div className="border-t border-slate-700 pt-4">
+                        <BodyHeatmap workedMuscles={data.workedMuscles} />
+                    </div>
                 </div>
-            );
-        };
+
+                {rpEnabled && muscles.length > 0 && (
+                    <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-4 mb-4 text-left">
+                        <div className="text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-2">{t.rpFeedbackTitle} (RP)</div>
+                        <div className="text-[11px] text-slate-400 mb-2">{t.rpRatingHelp}</div>
+                        <div className="space-y-1">
+                            {muscles.map(m => <RatingRow key={m} muscle={m} />)}
+                        </div>
+                    </div>
+                )}
+
+                <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-center gap-3 p-3 bg-slate-800 border border-slate-700 rounded-xl mb-2">
+                        <label className="flex items-center gap-3 cursor-pointer">
+                            <div className="relative">
+                                <input type="checkbox" className="sr-only toggle-checkbox" checked={updateTemplate} onChange={() => setUpdateTemplate(!updateTemplate)} />
+                                <div className={`block w-10 h-6 rounded-full transition-colors ${updateTemplate ? 'bg-red-600' : 'bg-slate-600'}`}></div>
+                                <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${updateTemplate ? 'translate-x-4' : ''}`}></div>
+                            </div>
+                            <span className="text-sm font-bold text-white">{t.updateTemplate}</span>
+                        </label>
+                    </div>
+
+                    <div className="flex gap-3">
+                        <button onClick={handleShare} className="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors">
+                            <Icons.Share2 className="w-4 h-4" /> {t.share}
+                        </button>
+                        <button onClick={() => onClose({ updateTemplate, feedback })} className="flex-1 bg-red-600 hover:bg-red-500 text-white py-3 rounded-xl font-bold transition-colors shadow-lg shadow-red-900/20">
+                            {t.close}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
         const Modal = ({ isOpen, onClose, children }) => {
             if (!isOpen) return null;
@@ -446,6 +507,9 @@
             const [exercises, setExercises] = useLS('il_ex_v15', DEFAULT_LIBRARY);
             const [logs, setLogs] = useLS('il_logs_v15', []);
             const [showRIR, setShowRIR] = useLS('il_cfg_rir', true);
+            const [rpEnabled, setRpEnabled] = useLS('il_cfg_rp', true);
+            const [rpTargetRIR, setRpTargetRIR] = useLS('il_cfg_rp_rir', 2);
+            const [rpFeedback, setRpFeedback] = useLS('il_rp_fb_v1', {});
 
             const [restTimer, setRestTimer] = useState({ active: false, timeLeft: 0, duration: 120, endAt: 0 });
             const [menuOpenId, setMenuOpenId] = useState(null);
@@ -538,7 +602,99 @@ useEffect(() => {
             };
             const manualCreateExercise = (name, muscle) => { const newEx = { id: `custom_${Date.now()}`, name, muscle }; setExercises([...exercises, newEx]); };
             const deleteCustomExercise = (id) => { setExercises(exercises.filter(e => e.id !== id)); };
-            const checkWeekCompletion = (currentMeso, currentLogs) => { if (!currentMeso) return; const weekLogs = currentLogs.filter(l => l.mesoId === currentMeso.id && l.week === currentMeso.week); if (program.every((_, d) => weekLogs.some(l => l.dayIdx === d))) setTimeout(() => setActiveMeso(p => ({ ...p, week: p.week + 1 })), 1000); };
+            const checkWeekCompletion = (currentMeso, currentLogs) => { if (!currentMeso) return; const weekLogs = currentLogs.filter(l => l.mesoId === currentMeso.id && l.week === currentMeso.week); if (program.every((_, d) => weekLogs.some(l => l.dayIdx === d))) setTimeout(() => setActiveMeso(p => ({ ...p, week: p.week + 1 })), 1000); };// ---------------- RP (suggested progression) ----------------
+const parseRepRange = (str) => {
+    if (!str) return null;
+    const m = String(str).match(/(\d+)\s*[-–]\s*(\d+)/);
+    if (m) return { min: Number(m[1]), max: Number(m[2]) };
+    const n = Number(str);
+    if (!Number.isNaN(n) && n > 0) return { min: n, max: n };
+    return null;
+};
+
+const roundTo = (value, step=0.5) => {
+    const v = Number(value);
+    if (Number.isNaN(v)) return '';
+    return Math.round(v/step)*step;
+};
+
+const roundWeight = (w) => { const x = Number(w)||0; const step = x >= 20 ? 2.5 : 1; return Math.round(x/step)*step; };
+
+
+const getLastPerformanceForExercise = (exerciseId) => {
+    if (!exerciseId) return null;
+    for (const l of logs) {
+        if (activeMeso && l.mesoId !== activeMeso.id) continue;
+        if (l.skipped) continue;
+        const ex = (l.exercises || []).find(e => e.id === exerciseId);
+        if (!ex) continue;
+        const completed = (ex.sets || []).filter(s => s.completed);
+        if (!completed.length) continue;
+        const weights = completed.map(s => Number(s.weight)||0).filter(x => x>0);
+        const reps = completed.map(s => Number(s.reps)||0).filter(x => x>0);
+        const rirs = completed.map(s => Number(s.rpe)).filter(x => !Number.isNaN(x));
+        const avgW = weights.length ? (weights.reduce((a,b)=>a+b,0)/weights.length) : null;
+        const avgR = reps.length ? (reps.reduce((a,b)=>a+b,0)/reps.length) : null;
+        const avgRIR = rirs.length ? (rirs.reduce((a,b)=>a+b,0)/rirs.length) : null;
+        return { avgW, avgR, avgRIR };
+    }
+    return null;
+};
+
+const getRPSuggestion = (exerciseId, repRange, targetRIR) => {
+    const perf = getLastPerformanceForExercise(exerciseId);
+    if (!perf || perf.avgW === null) return null;
+    const { avgW, avgR, avgRIR } = perf;
+    const range = repRange || { min: 6, max: 10 };
+    const tRIR = Number.isFinite(targetRIR) ? targetRIR : 2;
+
+    let sugW = avgW;
+    let sugReps = avgR ?? range.min;
+
+    if (avgRIR !== null) {
+        if (avgRIR >= tRIR && (avgR ?? 0) < range.max) {
+            sugW = avgW;
+            sugReps = Math.min(range.max, Math.round((avgR ?? range.min) + 1));
+        } else if (avgRIR >= tRIR && (avgR ?? 0) >= range.max) {
+            sugW = avgW * 1.025;
+            sugReps = range.min;
+        } else if (avgRIR < tRIR - 1) {
+            sugW = avgW * 0.975;
+            sugReps = Math.max(range.min, Math.round((avgR ?? range.min)));
+        }
+    } else {
+        if ((avgR ?? 0) < range.max) {
+            sugReps = Math.min(range.max, Math.round((avgR ?? range.min) + 1));
+        } else {
+            sugW = avgW * 1.025;
+            sugReps = range.min;
+        }
+    }
+
+    return {
+        weight: roundWeight(sugW),
+        reps: sugReps,
+        base: { weight: roundWeight(avgW), reps: avgR ? Math.round(avgR) : '' }
+    };
+};
+
+const saveMuscleFeedback = (mesoId, week, feedbackObj) => {
+    if (!mesoId || !feedbackObj) return;
+    setRpFeedback(prev => {
+        const next = { ...(prev || {}) };
+        if (!next[mesoId]) next[mesoId] = {};
+        if (!next[mesoId][week]) next[mesoId][week] = {};
+        next[mesoId][week] = { ...next[mesoId][week], ...feedbackObj };
+        return next;
+    });
+};
+
+const formatHoursMinutes = (sec) => {
+    const total = Math.max(0, Math.floor(Number(sec) || 0));
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    return h > 0 ? `${h}:${String(m).padStart(2,'0')}` : `${m}m`;
+};
             
             const startSession = (dayIdx) => { 
                 const dayPlan = activeMeso.plan[dayIdx]; 
@@ -551,7 +707,18 @@ useEffect(() => {
                     const exDef = exercises.find(e => e.id === exId) || exercises[0]; 
                     const slotDef = program[dayIdx].slots[idx]; 
                     const targetSets = slotDef.setTarget || 3; 
-                    const initialSets = Array(targetSets).fill(null).map((_, i) => ({ id: Date.now() + Math.random() + i, weight: '', reps: '', rpe: '', completed: false, type: 'regular' })); 
+                    const repRange = parseRepRange(slotDef.reps);
+const sug = rpEnabled ? getRPSuggestion(exDef.id, repRange, rpTargetRIR) : null;
+const initialSets = Array(targetSets).fill(null).map((_, i) => ({
+    id: Date.now() + Math.random() + i,
+    weight: '',
+    reps: '',
+    hintWeight: (sug?.weight ?? ''),
+    hintReps: (sug?.reps ?? ''),
+    rpe: '',
+    completed: false,
+    type: 'regular'
+})); 
                     return { ...exDef, slotLabel: tm(slotDef.muscle), targetReps: slotDef.reps, instanceId: Date.now() + Math.random() + idx, note: '', sets: initialSets, weightUnit: 'kg' }; 
                 }); 
                 setActiveSession({ id: Date.now(), dayIdx, name: `${t.week} ${activeMeso.week} • ${program[dayIdx].dayName[lang]}`, exercises: sessionExs, startTime: null, mesoId: activeMeso.id, week: activeMeso.week }); navigate('workout'); 
@@ -643,9 +810,9 @@ useEffect(() => {
                 } };
             const updateSet = (exId, setId, f, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === setId ? {...s, [f]: v} : s)} : e)}));
             const updateNote = (exId, v) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, note: v} : e)}));
-            const addSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: [...e.sets, { id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }]} : e)}));
+            const addSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: [...e.sets, { id: Date.now(), weight: '', reps: '', hintWeight: '', hintReps: '', rpe: '', completed: false, type: 'regular' }]} : e)}));
             const removeLastSet = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.slice(0, -1)} : e)}));
-            const addSetAt = (exId, anchor) => setActiveSession(p => { const exIdx = p.exercises.findIndex(e => e.instanceId === exId); const newSets = [...p.exercises[exIdx].sets]; const anchorIdx = newSets.findIndex(s => s.id === anchor); newSets.splice(anchorIdx + 1, 0, { id: Date.now(), weight: '', reps: '', rpe: '', completed: false, type: 'regular' }); const newExs = [...p.exercises]; newExs[exIdx] = { ...p.exercises[exIdx], sets: newSets }; return { ...p, exercises: newExs }; });
+            const addSetAt = (exId, anchor) => setActiveSession(p => { const exIdx = p.exercises.findIndex(e => e.instanceId === exId); const newSets = [...p.exercises[exIdx].sets]; const anchorIdx = newSets.findIndex(s => s.id === anchor); newSets.splice(anchorIdx + 1, 0, { id: Date.now(), weight: '', reps: '', hintWeight: '', hintReps: '', rpe: '', completed: false, type: 'regular' }); const newExs = [...p.exercises]; newExs[exIdx] = { ...p.exercises[exIdx], sets: newSets }; return { ...p, exercises: newExs }; });
             const deleteSetAt = (exId, id) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.filter(s => s.id !== id)} : e)}));
             const toggleSkipSet = (exId, id) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === id ? {...s, skipped: !s.skipped} : s)} : e)}));
             const changeSetType = (exId, id, type) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, sets: e.sets.map(s => s.id === id ? {...s, type} : s)} : e)}));
@@ -658,8 +825,13 @@ useEffect(() => {
             const toggleUnit = (exId) => setActiveSession(p => ({...p, exercises: p.exercises.map(e => e.instanceId === exId ? {...e, weightUnit: e.weightUnit === 'pl' ? 'kg' : 'pl'} : e)}));
             const finishWorkout = () => { const duration = activeSession.startTime ? (Date.now() - activeSession.startTime)/1000 : 0; let vol=0, sets=0, reps=0, muscles=[]; activeSession.exercises.forEach(ex => { let worked=false; ex.sets.forEach(s => { if(s.completed) { vol += (Number(s.weight)||0)*(Number(s.reps)||0); sets++; reps+=(Number(s.reps)||0); worked=true; } }); if(worked) muscles.push(ex.muscle); }); setSummaryData({ name: activeSession.name, duration, totalVolume: vol, totalSets: sets, totalReps: reps, workedMuscles: [...new Set(muscles)], sessionData: { ...activeSession, endTime: Date.now(), duration } }); };
             
-            const closeSummary = (shouldUpdateTemplate) => { 
+            const closeSummary = (payload) => {
+                const shouldUpdateTemplate = !!(payload && (payload.updateTemplate || payload === true));
+                const feedback = (payload && payload.feedback) ? payload.feedback : null;
+ 
                 const log = summaryData.sessionData; 
+                if (rpEnabled && feedback && activeMeso) { saveMuscleFeedback(activeMeso.id, activeMeso.week, feedback); }
+
                 
                 if (shouldUpdateTemplate) {
                     const newProgram = [...program];
@@ -695,6 +867,42 @@ useEffect(() => {
             const mesoAverageVolume = useMemo(() => { if (!activeMeso || !logs || logs.length === 0) return {}; const mesoLogs = logs.filter(l => l.mesoId === activeMeso.id && !l.skipped); if (mesoLogs.length === 0) return {}; const weeks = new Set(mesoLogs.map(l => l.week)).size || 1; const totalVol = {}; mesoLogs.forEach(l => { l.exercises.forEach(ex => { const sets = ex.sets.filter(s => s.completed).length; if (sets > 0) totalVol[ex.muscle] = (totalVol[ex.muscle] || 0) + sets; }); }); const avgVol = {}; Object.keys(totalVol).forEach(m => { avgVol[m] = Math.round((totalVol[m] / weeks) * 10) / 10; }); return avgVol; }, [logs, activeMeso]);
             const mesoStats = useMemo(() => activeMeso && logs ? { totalWorkouts: logs.filter(l => l.mesoId === activeMeso.id && !l.skipped).length } : null, [logs, activeMeso]);
 
+            // RP volume suggestions (based on last muscle feedback: 1-2 => +1 set, 3-4 => hold, 5 => -1 set)
+            const getLatestRpRating = (muscle) => {
+                try {
+                    if (!activeMeso?.id || !rpFeedback) return null;
+                    const byMeso = rpFeedback[activeMeso.id];
+                    if (!byMeso) return null;
+                    const weeks = Object.keys(byMeso).map(w => Number(w)).filter(n => !Number.isNaN(n)).sort((a,b)=>a-b);
+                    for (let i = weeks.length - 1; i >= 0; i--) {
+                        const w = weeks[i];
+                        const val = byMeso[w]?.[muscle];
+                        if (val !== undefined && val !== null && val !== '') return Number(val);
+                    }
+                    return null;
+                } catch (e) { return null; }
+            };
+
+            const rpDeltaFromRating = (rating) => {
+                if (rating == null || Number.isNaN(Number(rating))) return null;
+                const r = Number(rating);
+                if (r <= 2) return 1;
+                if (r >= 5) return -1;
+                return 0;
+            };
+
+            const rpBadge = (muscle) => {
+                const rating = getLatestRpRating(muscle);
+                const d = rpDeltaFromRating(rating);
+                if (d == null) return null;
+                const txt = d > 0 ? "RP +1" : d < 0 ? "RP -1" : "RP =";
+                const cls = d > 0 ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-300 border-green-200 dark:border-green-800" :
+                            d < 0 ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300 border-red-200 dark:border-red-800" :
+                                    "bg-gray-50 text-gray-700 dark:bg-slate-700/40 dark:text-gray-200 border-gray-200 dark:border-slate-600";
+                return { txt, cls, rating };
+            };
+
+
             return (
                 <div className={`w-full h-full flex flex-col ${theme}`}>
                     <div className="h-full flex flex-col bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 overflow-hidden">
@@ -716,6 +924,17 @@ useEffect(() => {
                                     <button onClick={() => setShowRIR(!showRIR)} className={`w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors ${!showRIR ? 'opacity-70' : ''}`}>
                                         {showRIR ? <Icons.Eye className="w-4 h-4" /> : <Icons.EyeOff className="w-4 h-4" />} {t.showRIR}
                                     </button>
+                                    <div className="mt-3">
+                                        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">{t.rp}</div>
+                                        <button onClick={() => setRpEnabled(!rpEnabled)} className={`w-full min-w-0 mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex flex-wrap items-center justify-start gap-2 whitespace-normal text-left leading-tight border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors ${!rpEnabled ? 'opacity-70' : ''}`}>
+                                            <Icons.TrendingUp className="w-4 h-4" /> {t.rpEnabled}: {rpEnabled ? 'ON' : 'OFF'}
+                                        </button>
+                                        <div className="flex items-center gap-3 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg px-3 py-2">
+                                            <div className="text-sm font-bold text-gray-600 dark:text-gray-300">{t.rpTargetRIR}</div>
+                                            <input type="number" min="0" max="5" step="1" value={rpTargetRIR} onChange={e => setRpTargetRIR(Math.max(0, Math.min(5, Number(e.target.value)||0)))} className="ml-auto w-16 bg-gray-100 dark:bg-slate-700 rounded px-2 py-1 text-sm font-mono text-center" />
+                                        </div>
+                                    </div>
+
                                     <button onClick={() => { setShowSettings(false); openOverlay('exercises', setManagingExercises); }} className="w-full mb-2 py-3 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 rounded-lg font-bold text-sm flex items-center justify-center gap-2 border border-gray-200 dark:border-slate-700 hover:border-red-500 dark:hover:border-red-500 transition-colors">
                                         <Icons.Dumbbell className="w-4 h-4" /> {t.manageEx}
                                     </button>
@@ -749,7 +968,7 @@ useEffect(() => {
                             />
                         )}
                         {swapConfirmation && <SwapConfirmationModal isOpen={!!swapConfirmation} onClose={() => setSwapConfirmation(null)} onSessionOnly={() => confirmSwap('session')} onForever={() => confirmSwap('forever')} t={t} exerciseName={getExName(swapConfirmation?.exercise)} />}
-                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} />}
+                        {summaryData && <SummaryView data={summaryData} onClose={closeSummary} t={t} rpEnabled={rpEnabled} />}
 
                         {/* HEADER & NAV */}
                         {view !== 'workout' && (
@@ -803,6 +1022,9 @@ useEffect(() => {
                                                             <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400">{tm(muscle)}</span>
                                                             <div className="flex items-center gap-2">
                                                                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${status.bg} ${status.color}`}>{status.label}</span>
+                                                                {rpEnabled && rpBadge(muscle) && (
+                                                                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${rpBadge(muscle).cls}`} title={`RP rating: ${rpBadge(muscle).rating} (1-5)`}>{rpBadge(muscle).txt}</span>
+                                                                )}
                                                                 <span className="text-xs font-bold text-gray-900 dark:text-white">{sets} {t.sets}</span>
                                                             </div>
                                                         </div>
@@ -849,8 +1071,8 @@ useEffect(() => {
                                                     <div className="divide-y divide-gray-50 dark:divide-slate-700">{ex.sets.map((set, idx) => (
                                                         <div key={set.id} className={`grid grid-cols-10 gap-1 px-3 py-2 items-center ${set.completed ? 'bg-green-50/30 dark:bg-green-900/10' : set.skipped ? 'opacity-40 grayscale' : 'bg-white dark:bg-slate-800'}`}>
                                                             <div className="col-span-1 flex justify-center"><button onClick={() => setSetMenuContext({ exId: ex.instanceId, setId: set.id, type: set.type, skipped: set.skipped })} className={`w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold ${set.type !== 'regular' && !set.skipped ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 ring-1 ring-red-200 dark:ring-red-900' : 'bg-gray-100 dark:bg-slate-700 text-gray-500 dark:text-gray-400'}`}>{idx + 1}</button></div>
-                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.weight} onChange={(e) => updateSet(ex.instanceId, set.id, 'weight', e.target.value)} /></div>
-                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.reps} onChange={(e) => updateSet(ex.instanceId, set.id, 'reps', e.target.value)} /></div>
+                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.weight} placeholder={set.hintWeight ? String(set.hintWeight) : ""} onChange={(e) => updateSet(ex.instanceId, set.id, 'weight', e.target.value)} /></div>
+                                                            <div className={showRIR ? "col-span-3" : "col-span-4"}><input type="number" disabled={set.skipped} className="w-full bg-gray-100 dark:bg-slate-700 border-none rounded py-1.5 text-center text-sm font-bold text-gray-800 dark:text-gray-200 placeholder-gray-300 dark:placeholder-slate-500" value={set.reps} placeholder={set.hintReps ? String(set.hintReps) : ""} onChange={(e) => updateSet(ex.instanceId, set.id, 'reps', e.target.value)} /></div>
                                                             {showRIR && <div className="col-span-2"><input type="number" disabled={set.skipped} className="w-full bg-transparent border-none py-1 text-center text-xs font-bold text-gray-500 dark:text-gray-400 placeholder-gray-200 dark:placeholder-slate-600" value={set.rpe} onChange={(e) => updateSet(ex.instanceId, set.id, 'rpe', e.target.value)} /></div>}
                                                             <div className="col-span-1 flex justify-center"><button disabled={set.skipped} onClick={() => toggleSet(ex.instanceId, set.id)} className={`w-6 h-6 rounded border flex items-center justify-center ${set.completed ? 'bg-green-500 border-green-500 text-white' : 'bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-transparent hover:border-gray-400'}`}><Icons.Check className="w-4 h-4" /></button></div>
                                                             {set.type !== 'regular' && !set.skipped && <div className="col-span-10 flex justify-start pl-2 pb-1"><SetTypeBadge type={set.type} /></div>}
